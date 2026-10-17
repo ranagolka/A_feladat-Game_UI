@@ -27,4 +27,4 @@ npx esbuild test/store.test.ts --bundle --platform=node --outfile=build/store.te
 
 ## Licenc
 
-A Comic Neue betűtípus a SIL Open Font License alatt áll (`prototype/assets/OFL-ComicNeue.txt`) — a repó CC0-licence erre nem vonatkozik. A Figma-eszközök (háttér, keretek, gyűrűk) a projekt saját tervei.
+© 2026 ZupaGut — minden jog fenntartva (lásd `LICENSE`). A Comic Neue betűtípus a SIL Open Font License 1.1 alatt áll (`prototype/assets/OFL-ComicNeue.txt`). A Feladat című regény és szereplői Zsoldos Péter szellemi tulajdonát képezik.

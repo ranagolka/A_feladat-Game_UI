@@ -1,0 +1,252 @@
+<title>A Feladat Beállítások</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Inter:wght@400;600;700&display=swap">
+<style>
+/* Comic Neue — a teljes, OFL-licencű font beágyazva. A Google Fonts ehhez a családhoz csak a „latin" részhalmazt
+   szolgálja ki (nincs latin-ext), így az Ő/Ű/ő/ű és a lengyel ą/ę/ł/ś/ż tartalékbetűre esne. Licenc: assets/OFL-ComicNeue.txt */
+@font-face { font-family: "Comic Neue"; font-weight: 400; font-style: normal; font-display: block;
+  src: url("__ASSET:ComicNeue-Regular.ttf__") format("truetype"); }
+@font-face { font-family: "Comic Neue"; font-weight: 700; font-style: normal; font-display: block;
+  src: url("__ASSET:ComicNeue-Bold.ttf__") format("truetype"); }
+/* Elrendezés: egyetlen 1920×1080 játékvászon (a Figma referenciája), alatta a fejlesztői panel.
+   Tokenek a Game UI Figma-változóiból. Szándékosan egytémás: a UI a világos LAP-on él (2.7, 09.07). */
+:root {
+  --paper: #f2f1eb;          /* LAP — ⚑ a végleges érték nyitott (2.7) */
+  --ink: #020d34;            /* primary/contrast/main */
+  --ink-soft: rgba(2,13,52,.5);   /* primary/border/light */
+  --red: #bd0a1c;            /* secondary/contrast/main */
+  --neutral: #4a4644;        /* neutral/contrast */
+  --neutral-line: rgba(74,70,68,.5);
+  --disabled: #aeaaa6;       /* primary/contrast/main-disabled */
+  --scrim-warning: rgba(100,8,12,.9);   /* primary/surface/scrim-warning #64080C, 90% */
+  --scrim-info: rgba(19,41,112,.9);     /* primary/surface/scrim-info #132970, 90% */
+  --page: #e4e2da;           /* a vászon körüli asztallap */
+  --font-ui: "Comic Neue", "Comic Sans MS", "Chalkboard SE", cursive; /* font-family/default (Figma) — DÖNTÉS 10.17 */
+  --font-read: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-dev: "Inter", "Segoe UI", system-ui, sans-serif;
+  --fs: 28px;                /* font-size/350 */
+  --bw: 2px;                 /* border-width/semibold */
+  color-scheme: light;
+}
+html, body { height: auto; }
+body {
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--font-dev);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 32px;
+}
+.wrap { max-width: 1400px; margin: 0 auto; display: grid; gap: 16px; }
+.head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
+.head h1 { margin: 0; font: 700 22px/1.2 var(--font-ui); letter-spacing: .02em; text-wrap: balance; }
+.head p { margin: 0; font-size: 13px; color: var(--neutral); }
+
+/* ---------- a vászon ---------- */
+#viewport { position: relative; width: 100%; aspect-ratio: 16 / 9; max-width: 100%; overflow: hidden;
+  box-shadow: 0 1px 0 rgba(2,13,52,.15), 0 12px 40px -18px rgba(2,13,52,.45); background: var(--paper); }
+#stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0;
+  font-family: var(--font-ui); font-size: var(--fs); color: var(--ink); background: var(--paper); overflow: hidden; }
+#ui *, #ui *::before, #ui *::after { box-sizing: border-box; } /* a Figma-kód border-box méretezést feltételez */
+#ui { position: absolute; inset: 0; font-family: var(--font-ui); font-size: var(--fs); }
+#ui.readable { --font-ui: var(--font-read); --fs: 34px; }
+#stage :focus { outline: none; } /* a fókuszt a forma jelzi: ">" + sraffozás + szín (4.1) */
+
+/* Háttér — a Figma „UI-AUD-1-default" rétegei, a saját eszközeivel (assets/):
+   papírcsempe 248 px · rácsmetszéspontok (4 × 56 px kar + 2 px pont) rombusz-maszkkal (közép 15%) ·
+   topomap 12%-on, jobbra elforgatva · pageSideDecor a négy szélen. Passzerjel nincs. */
+.paper { position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+  background: var(--paper) url("__ASSET:paper.png__") repeat 0 0 / 248px 248px; }
+.paper .masked { position: absolute; left: 0; top: 0; width: 1921px; height: 1081px;
+  -webkit-mask: url("__ASSET:fade-mask.svg__") no-repeat 0 0 / 1921px 1081px; mask: url("__ASSET:fade-mask.svg__") no-repeat 0 0 / 1921px 1081px; }
+.paper .grid { position: absolute; inset: 0; }
+.paper .grid i { position: absolute; display: block; }
+.paper .grid .av { width: .75px; height: 56px; background: url("__ASSET:grid-arm-v.svg__") no-repeat 0 0 / 100% 100%; transform: scaleY(-1); }
+.paper .grid .ah { width: 56px; height: .75px; background: url("__ASSET:grid-arm-h.svg__") no-repeat 0 0 / 100% 100%; }
+.paper .grid .dot { width: 2px; height: 2px; background: var(--neutral); }
+.paper .topo-wrap { position: absolute; right: 0; top: 0; width: 591px; height: 1081px; display: flex; align-items: center; justify-content: center; }
+.paper .topo { flex: none; position: relative; width: 1081px; height: 591px; opacity: .12; transform: rotate(-90deg); }
+.paper .topo > div { position: absolute; inset: 0; overflow: hidden; }
+.paper .topo img { position: absolute; left: -19.61%; top: 0; width: 119.61%; height: 123.02%; max-width: none; }
+.paper .side { position: absolute; display: block; max-width: none; }
+.paper .side-top { left: 60px; top: 0; width: 1800px; height: 48px; }
+.paper .side-bottom { left: 60px; bottom: 0; width: 1800px; height: 48px; }
+.paper .side-v { top: 60px; width: 48px; height: 960px; display: flex; align-items: center; justify-content: center; }
+.paper .side-v img { flex: none; width: 960px; height: 48px; max-width: none; }
+.paper .side-right { right: 0; } .paper .side-right img { transform: rotate(90deg); }
+.paper .side-left { left: 0; }  .paper .side-left img { transform: rotate(90deg) scaleY(-1); }
+
+/* sraffozás — crosshatchActive: 192 px-es csempe, 48%-on, alapszín nélkül */
+.hatch { position: relative; }
+.hatch::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .48;
+  background: url("__ASSET:crosshatch.png__") repeat 0 0 / 192px 192px; }
+.hatch > :not(.frame):not(.ln):not(.shadow) { position: relative; }
+
+/* kézzel húzott tuskeret: a szegély külön rétegen, torzító szűrővel — a szöveg éles marad */
+.frame { position: absolute; inset: 0; border: var(--bw) solid var(--ink-soft); pointer-events: none; filter: url(#rough); }
+
+.screen { position: absolute; inset: 0; isolation: isolate; } /* saját rétegrend: az aktív fül z-indexe nem léphet a scrim fölé */
+/* CategoryNavigation — x 60, y 60, 1800 széles: 120 px vezérlő · fülcsoport · 120 px vezérlő */
+.navbar { position: absolute; top: 60px; left: 60px; width: 1800px; display: flex; align-items: flex-start; }
+.navctl { flex: none; width: 120px; height: 60px; padding-top: 2px; display: flex; align-items: center; }
+.navctl.lb { justify-content: flex-end; padding-right: 16px; }
+.navctl.rb { padding-left: 16px; }
+.bumper { position: relative; width: 75px; height: 38px; flex: none; }
+.bumper img { position: absolute; left: 2px; top: 50%; width: 71px; height: 34px; transform: translateY(-50%); max-width: none; }
+.bumper.rb img { transform: translateY(-50%) scaleX(-1); }
+.bumper span { position: absolute; left: 0; right: 0; top: 28.95%; text-align: center;
+  font: 700 24px/1 "Kalam", var(--font-ui); letter-spacing: .24px; color: #101030; } /* Controller/Small — a Figmában még Kalam */
+.tabs { flex: 1; display: flex; min-width: 0; position: relative; }
+.tab { position: relative; flex: 1 0 0; min-width: 0; min-height: 60px; display: flex; align-items: center; justify-content: center;
+  padding: 18px 8px 14px; text-align: center; font-weight: 700; line-height: 28px; text-transform: uppercase;
+  overflow-wrap: anywhere; hyphens: manual; }
+/* kézzel húzott fülvonalak (a Figma SVG-i, nyújtva) */
+.tab .ln { position: absolute; display: block; pointer-events: none; background-repeat: no-repeat; background-size: 100% 100%; }
+.tab .ln-t { left: 0; right: 0; top: -.75px; height: 1.5px; background-image: url("__ASSET:tab-top.svg__"); }
+.tab .ln-b { left: 0; right: 0; bottom: -.75px; height: 1.5px; background-image: url("__ASSET:tab-bottom.svg__"); transform: rotate(180deg); }
+.tab .ln-r { top: -1px; bottom: -1px; right: -.75px; width: 1.5px; background-image: url("__ASSET:tab-right.svg__"); transform: scaleY(-1); }
+.tab .ln-l { top: -1px; bottom: -1px; left: -.75px; width: 1.5px; background-image: url("__ASSET:tab-right.svg__"); }
+.tab.is-active { color: var(--red); z-index: 1; }
+.tab.is-active .ln-t { top: -1.5px; height: 3px; background-image: url("__ASSET:tab-top-active.svg__"); }
+.tab.is-active .ln-b { bottom: -1.5px; height: 3px; background-image: url("__ASSET:tab-bottom-active.svg__"); }
+.tab.is-active .ln-r { right: -1.5px; width: 3px; background-image: url("__ASSET:tab-side-active.svg__"); }
+.tab.is-active .ln-l { left: -1.5px; width: 3px; background-image: url("__ASSET:tab-side-active.svg__"); }
+/* active-menu-shadow: 8 px-es vonás, középvonala 3 px-re a fül alja alatt */
+.tab .shadow { position: absolute; left: 0; right: 0; bottom: -7px; height: 8px; background: var(--red); }
+.tab-label { position: relative; flex: 1 0 0; min-width: 0; }
+
+.panel { position: absolute; top: 180px; left: 180px; right: 180px; bottom: 150px; display: flex; flex-direction: column; }
+.row { position: relative; min-height: 120px; display: grid; grid-template-columns: 120px minmax(0, 1fr) 600px;
+  align-items: center; padding-right: 120px; }
+.row .marker { justify-self: end; margin-right: 6px; visibility: hidden; color: var(--red); font-weight: 700; position: relative; top: -2px; } /* optikai középre */
+.row .label { text-transform: uppercase; overflow-wrap: anywhere; line-height: 1.15; }
+.row.is-focused { color: var(--red); }
+.row.is-focused .marker { visibility: visible; }
+.row.is-focused .label { font-weight: 700; }
+.row.is-disabled { color: var(--disabled); }
+.control { display: flex; align-items: center; gap: 8px; }
+.chev { width: 28px; flex: none; text-align: center; font-weight: 400; position: relative; top: -2px; } /* optikai középre */
+.chev.is-off { color: var(--disabled); }
+.row.is-focused .chev:not(.is-off) { font-weight: 700; } /* félkövér csak fókuszban; a letiltott mindig vékony, szürke */
+/* meter — 10 egymáshoz illesztett szegmens: 1,5 px keret, 16 px magas, 4 px belső tér, a kitöltöttben 8 px-es sáv */
+.meter { flex: 1; min-width: 0; display: flex; }
+#ui .seg { flex: 1 0 0; min-width: 0; box-sizing: content-box; height: 8px; padding: 4px; border: 1.5px solid currentColor; }
+/* középre igazított keret: a szomszédos szegmensek 1,5 px-es vonása fedi egymást, nem duplázódik */
+#ui .seg + .seg { margin-left: -1.5px; }
+.seg.on::after { content: ""; display: block; height: 8px; background: currentColor; }
+/* a kitöltött/üres GEOMETRIA viszi a mennyiséget, nem csak a szín (spec 9.2) */
+.row:not(.is-focused) .meter { color: var(--ink); }
+.value { white-space: nowrap; }
+.row.is-focused .value { font-weight: 700; }
+
+.placeholder { margin: 60px 120px; max-width: 900px; color: var(--neutral); line-height: 1.35; }
+.placeholder .ph-title { margin: 0 0 12px; color: var(--ink); font-weight: 700; font-size: 1.15em; }
+.placeholder p { margin: 0; }
+
+/* ActionBar — sima 1,5 px navy szegély, alul 60 px-re, 60 magas, px 40, gap 32 */
+.actionbar { position: absolute; left: 180px; right: 180px; bottom: 60px; min-height: 60px; display: flex; align-items: center; justify-content: flex-end;
+  padding: 0 40px; border: 1.5px solid var(--ink); }
+.bar-items { position: relative; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px 32px; }
+/* ControllerButton (Figma 20:4891) — 32 px gombjel + felirat, 8 px rés; default navy · focused piros · disabled szürke */
+.ctrl-btn { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; line-height: 28px; text-transform: uppercase; white-space: nowrap; color: var(--ink); }
+.ctrl-btn.is-focused { color: var(--red); }
+.ctrl-btn.is-disabled { color: var(--disabled); }
+/* ControllerButton — 32 px-es kézzel rajzolt gyűrű, rajta a betű */
+.glyph { position: relative; width: 32px; height: 32px; flex: none; display: inline-grid; place-items: center;
+  font: 700 28px/28px var(--font-ui); }
+.glyph img { position: absolute; left: -2.12%; top: -2.15%; width: 104.47%; height: 103.87%; max-width: none; }
+.glyph b { position: relative; font-weight: 700; }
+
+/* Modal (Figma 28:7907) — 840 × 288 alapméret, x 540 · y 220; a háttér inert, a fókusz a dialóguson */
+.scrim { position: absolute; inset: 0; }
+.scrim-warning { background: var(--scrim-warning); }
+.scrim-info { background: var(--scrim-info); }
+.modal { position: absolute; left: 540px; top: 220px; width: 840px; min-height: 288px; padding: 48px 40px 40px;
+  display: flex; flex-direction: column; gap: 32px; outline: none; }
+/* shadow: ugyanaz a crosshatch-csempe, két rétegben, ellentétes irányú vonalakkal */
+.m-shadow1, .m-shadow2 { position: absolute; pointer-events: none; background: url("__ASSET:crosshatch.png__") repeat 0 0 / 192px 192px; }
+.m-shadow1 { inset: 24px -24px -72px -24px; opacity: .8; transform: scaleX(-1); }
+.m-shadow2 { inset: 40px -8px -32px -8px; }
+.m-shadow-arrow { position: absolute; right: 24px; bottom: -88px; width: 48px; height: 56px; max-width: none; }
+.m-paper { position: absolute; inset: 0; background: #f0f0ea; } /* Figma: var(--paper, #f0f0ea) */
+.m-content { position: relative; display: flex; flex-direction: column; gap: 32px; min-height: 136px; } /* Figma: content 136 px */
+.modal h2 { position: relative; width: fit-content; max-width: 100%; margin: 0; color: var(--red); font-size: 36px; line-height: 32px; font-weight: 700; text-transform: uppercase; } /* Modal/Title */
+/* addon: a cím feletti 8 px-es piros sáv, a modal tetején (48 px = a felső padding), pontosan a cím szélességében */
+.modal h2::before { content: ""; position: absolute; left: 0; right: 0; top: -48px; height: 8px; background: var(--red); }
+.modal p { margin: 0; font-size: 28px; line-height: 36px; font-weight: 400; } /* Modal/Description */
+#ui.readable .modal h2 { font-size: 42px; line-height: 1.1; }
+#ui.readable .modal p { font-size: 34px; line-height: 1.3; }
+.m-actions { position: relative; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 16px 32px; }
+/* a Figma kézzel húzott kerete (28:7974): 846 × 293, a modalhoz képest (−3, −2.286); a dobozzal együtt nyúlik */
+.m-border { position: absolute; left: -3px; top: -2.286px; width: calc(100% + 6px); height: calc(100% + 4.714px); pointer-events: none;
+  background: url("__ASSET:modal-border.svg__") no-repeat 0 0 / 100% 100%; }
+.m-arrow { position: absolute; right: 42px; bottom: -48px; width: 48px; height: 56px; max-width: none; }
+.m-arrow-border { position: absolute; right: 39.24px; bottom: -52.92px; width: 51.32px; height: 62.28px; max-width: none; } /* 48×56 doboz, inset −2.43% −5.74% −8.79% −1.17% */
+
+.closed { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 30px; }
+.closed-title { text-transform: uppercase; margin: 0; font-size: 1.6em; font-weight: 700; letter-spacing: .04em; }
+
+/* ---------- fejlesztői panel ---------- */
+#dev { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.dev-col { min-width: 0; background: #f6f5f0; border: 1px solid rgba(2,13,52,.14); padding: 14px 16px; font-size: 13px; }
+.dev-wide { grid-column: 1 / -1; }
+.dev-col h3 { margin: 0 0 10px; font: 700 12px/1 var(--font-dev); text-transform: uppercase; letter-spacing: .08em; color: var(--neutral); }
+.state { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 10px; }
+.pill { display: inline-block; padding: 3px 10px; border: 1.5px solid var(--red); color: var(--red); font-weight: 700; font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
+.ctx { color: var(--neutral); }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 4px 6px; border-bottom: 1px solid rgba(2,13,52,.1); }
+th { font-weight: 600; color: var(--neutral); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+td:first-child { font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
+tr.diff td:last-child { color: var(--red); font-weight: 700; }
+.log { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.log .snd { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--red); }
+.muted { color: var(--neutral); }
+.small { font-size: 12px; line-height: 1.5; margin: 10px 0 0; }
+.seg-ctl { display: inline-flex; margin-bottom: 10px; }
+button { font: 600 13px var(--font-dev); color: var(--ink); background: var(--paper); border: 1.5px solid var(--ink-soft); padding: 6px 12px; cursor: pointer; }
+.seg-ctl button + button { border-left-width: 0; }
+button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+button.wide { display: block; width: 100%; margin-top: 10px; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+.chk { display: flex; gap: 8px; align-items: baseline; margin: 6px 0; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="rough" x="-10%" y="-40%" width="120%" height="180%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="2" seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="1.9" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
+<div class="wrap">
+  <header class="head">
+    <h1>A Feladat · Beállítások — Hang szelet</h1>
+    <p>Settings UI prototípus · spec v1.0 · 1920 × 1080 referencia</p>
+  </header>
+  <div id="viewport">
+    <div id="stage">
+      <div class="paper" aria-hidden="true">
+        <div class="masked">
+          <div class="grid" id="grid"></div>
+          <div class="topo-wrap"><div class="topo"><div><img alt="" src="__ASSET:topomap.png__"></div></div></div>
+        </div>
+        <img class="side side-top" alt="" src="__ASSET:side-top.svg__">
+        <img class="side side-bottom" alt="" src="__ASSET:side-bottom.svg__">
+        <div class="side side-v side-right"><img alt="" src="__ASSET:side-right.svg__"></div>
+        <div class="side side-v side-left"><img alt="" src="__ASSET:side-left.svg__"></div>
+      </div>
+      <div id="ui" aria-label="Beállítások"></div>
+    </div>
+  </div>
+  <section id="dev" data-dev-panel aria-label="Fejlesztői panel"></section>
+</div>
+
+<script>
+window.__ASSETS = { ring: "__ASSET:button-ring-1.5px.svg__", ringFocused: "__ASSET:button-ring-focused-1.5px.svg__", ringDisabled: "__ASSET:button-ring-disabled-1.5px.svg__", bumper: "__ASSET:bumper-lb.svg__" };
+window.__ASSETS_MODAL = { arrow: "__ASSET:modal-arrow.svg__", arrowBorder: "__ASSET:modal-arrow-border.svg__", shadowArrow: "__ASSET:modal-shadow-arrow.png__" };
+/*__BUNDLE__*/
+</script>

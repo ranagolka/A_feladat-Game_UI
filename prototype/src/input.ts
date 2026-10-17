@@ -7,10 +7,9 @@ export type Action =
   | 'PreviousCategory' | 'NextCategory'
   | 'PreviousItem' | 'NextItem'
   | 'DecreaseValue' | 'IncreaseValue'
-  | 'Confirm' | 'SecondaryAction' | 'ApplySettings' | 'ResetToDefaults' | 'Back'
-  | 'OpenSettings';
+  | 'Confirm' | 'SecondaryAction' | 'ApplySettings' | 'ResetToDefaults' | 'Back';
 
-export type Context = 'list' | 'modal' | 'closed';
+export type Context = 'start' | 'list' | 'modal';
 
 /** A kontextusonkénti kötéstábla. Egyetlen helyen cserélhető. */
 export const BINDINGS: Record<Context, Partial<Record<Button, Action>>> = {
@@ -23,7 +22,8 @@ export const BINDINGS: Record<Context, Partial<Record<Button, Action>>> = {
   // ⚠ 10.17 (Figma 28:7907): a modal gombjai ControllerButtonok — a rajzolt gombjel maga a kötés.
   // X = másodlagos (Elvetés) · A = elsődleges (Mentés / Visszaállítás) · B = Mégsem. (Eltér a UI-NAV-009 fókuszmodelljétől.)
   modal: { X: 'SecondaryAction', A: 'Confirm', B: 'Back' },
-  closed: { A: 'OpenSettings', Menu: 'OpenSettings' },
+  // Nyitóoldal (Figma 1:678): függőleges menü; az A a fókuszált menüpontot választja.
+  start: { Up: 'PreviousItem', Down: 'NextItem', A: 'Confirm' },
 };
 
 /** ⚑ NYITOTT (spec 14.): deadzone, initial delay, repeat rate. Munkaértékek. */

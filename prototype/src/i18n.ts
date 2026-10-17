@@ -1,5 +1,5 @@
 // DEV-008 — Kulcsalapú EN/HU szövegkészlet. Az alapnyelv a magyar.
-// FORRÁS: a Figma „Language / Settings" változógyűjteménye (English / Hungarian mód) — a kulcsok a tokenek nevei.
+// FORRÁS: a Figma „Language / Settings" és „Language / Start" változógyűjteménye (English / Hungarian mód) — a kulcsok a tokenek nevei.
 // Ami ott nincs (Reset modal, prototípus-segédszövegek), az a spec v1.0-ból vagy a prototípusból jön, és jelölve van.
 
 export type Lang = 'hu' | 'en';
@@ -35,6 +35,12 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   'unsaved_changes/actions/secondary': { en: 'Discard', hu: 'Elvetés' },
   'unsaved_changes/actions/cancel': { en: 'Cancel', hu: 'Mégsem' },
 
+  // --- Figma: Language / Start (a mainMenu komponens label tulajdonságára kötve) ---
+  // ⚠ a Figma HU értéke elírt („Folyatatás") — itt javítva; a tokent a Figmában is javítani kell
+  main_continue: { en: 'Continue', hu: 'Folytatás' },
+  main_new: { en: 'New game', hu: 'Új játék' },
+  main_settings: { en: 'Settings', hu: 'Beállítások' },
+
   // --- spec v1.0, 7. fejezet (a Figmában még nincs token) ---
   'reset_defaults/title': { en: 'Reset to defaults', hu: 'Alapértékek visszaállítása' },
   'reset_defaults/description': {
@@ -50,8 +56,6 @@ const STRINGS: Record<string, Record<Lang, string>> = {
     en: 'The prototype implements the Audio tab first. LB / RB still switches category.',
     hu: 'A prototípus először a Hang fület valósítja meg. Az LB / RB itt is kategóriát vált.',
   },
-  'proto/closed/title': { en: 'Settings closed', hu: 'Beállítások bezárva' },
-  'proto/closed/hint': { en: 'Open settings', hu: 'Beállítások megnyitása' },
   'proto/a11y/percent': { en: '{v} percent', hu: '{v} százalék' },
 };
 

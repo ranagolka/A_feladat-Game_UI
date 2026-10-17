@@ -11,7 +11,7 @@ Kontrolleres Settings-menü prototípus egy Xbox/PC narratív sidescrollerhez (Z
 ## Felépítés (prototype/)
 - `src/schema.ts` beállítás-definíciók · `src/store.ts` default/saved/draft, dirty, tri-state (tiszta logika, tesztelt)
 - `src/input.ts` Gamepad → logikai gomb → kontextusonkénti akció (`BINDINGS`)
-- `src/app.ts` állapotgép, render, fókusz, modalok, `ctrlButton()` komponens · `src/i18n.ts` EN/HU (kulcsok = Figma `Language / Settings` tokenek)
+- `src/app.ts` állapotgép (nyitóoldal `start` → `settings`), render, fókusz, modalok, `ctrlButton()` komponens · `src/i18n.ts` EN/HU (kulcsok = Figma `Language / Settings` tokenek)
 - `template.html` CSS + markup; `__ASSET:fájl__` → a build data: URI-vá alakítja (`assets/`)
 
 ## Szabályok

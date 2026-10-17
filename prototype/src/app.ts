@@ -3,12 +3,21 @@ import { CATEGORIES, CategoryId, SettingDef, settingsOf } from './schema';
 import { ResetPolicy, SettingsStore } from './store';
 import { Action, BINDINGS, Button, Context, InputAdapter } from './input';
 import { Lang, t } from './i18n';
-import { SoundId, SoundRouter } from './sound';
+import { MusicPlayer, SoundId, SoundRouter } from './sound';
+
+const ASSETS_MUSIC = (window as unknown as { __ASSETS_MUSIC: string }).__ASSETS_MUSIC;
 
 const ASSETS_MODAL = (window as unknown as { __ASSETS_MODAL: { arrow: string; arrowBorder: string; shadowArrow: string } }).__ASSETS_MODAL;
 
 /** A Figma-eszközök data: URI-jai — a build tölti ki (template: window.__ASSETS). */
 const ASSETS = (window as unknown as { __ASSETS: { ring: string; ringFocused: string; ringDisabled: string; bumper: string } }).__ASSETS;
+
+const ASSETS_START = (window as unknown as { __ASSETS_START: Record<'bg' | 'sideTop' | 'sideBottom' | 'sideRight' | 'sideLeft' | 'title' | 'logo' | 'corner' | 'cornerFocused', string> }).__ASSETS_START;
+
+/** A nyitóoldal menüje (Figma 1:678, mainMenu komponens); az elemek a Language / Start tokenjei.
+ *  Ebben a szeletben csak a Beállítások vezet tovább. */
+const START_MENU = ['main_continue', 'main_new', 'main_settings'] as const;
+type StartItem = typeof START_MENU[number];
 
 type ModalKind = 'unsaved' | 'reset';
 type ModalAction = 'discard' | 'apply' | 'cancel' | 'reset';
@@ -31,7 +40,8 @@ const MODAL_BUTTONS: Record<ModalKind, { act: ModalAction; btn: Glyph; key: stri
 const WRAP = false;
 
 interface UIState {
-  screen: 'settings' | 'closed';
+  screen: 'start' | 'settings';
+  startIdx: number;
   cat: CategoryId;
   rowByCat: Record<CategoryId, number>;
   modal: null | { kind: ModalKind };
@@ -45,8 +55,10 @@ interface LogEntry { button: Button; action: Action | '—'; sound?: SoundId; no
 export class SettingsApp {
   store = new SettingsStore();
   sound = new SoundRouter();
+  music = new MusicPlayer(ASSETS_MUSIC);
   ui: UIState = {
-    screen: 'settings',
+    screen: 'start',
+    startIdx: 0, // a terv szerint a Folytatás a kezdő fókusz
     cat: 'audio',
     rowByCat: { game: 0, graphics: 0, audio: 0, controller: 0, accessibility: 0 },
     modal: null,
@@ -65,18 +77,19 @@ export class SettingsApp {
 
   start(): void {
     new InputAdapter(
-      (b) => this.press(b),
+      (b) => { this.startMusic(); this.press(b); }, // gamepadról a böngésző általában elutasítja — a következő gesztus pótolja
       (c) => { this.padConnected = c; this.renderDev(); },
     ).start();
-    this.stage.addEventListener('pointerdown', () => { this.sound.unlock(); this.renderDev(); });
+    this.stage.addEventListener('pointerdown', () => { this.sound.unlock(); this.startMusic(); });
     this.render();
+    this.startMusic(); // ha a böngésző engedi az autoplayt, rögtön szól
     void this.measureFonts();
   }
 
   // ---------- bemenet ----------
 
   private context(): Context {
-    if (this.ui.screen === 'closed') return 'closed';
+    if (this.ui.screen === 'start') return 'start';
     return this.ui.modal ? 'modal' : 'list';
   }
 
@@ -88,6 +101,10 @@ export class SettingsApp {
     this.log.length = Math.min(this.log.length, 8);
     this.pending = null;
     this.render();
+  }
+
+  private startMusic(): void {
+    if (!this.music.playing) void this.music.start().then(() => this.renderDev());
   }
 
   private play(id: SoundId) {
@@ -110,11 +127,14 @@ export class SettingsApp {
 
   dispatch(a: Action): void {
     const ui = this.ui;
-    if (a === 'OpenSettings') {
-      ui.screen = 'settings';
-      ui.cat = 'audio';
-      ui.rowByCat.audio = 0; // UI-NAV-004: determinált kezdő fókusz
-      this.play('UI-SND-004');
+    if (ui.screen === 'start') {
+      if (a === 'PreviousItem' || a === 'NextItem') {
+        const next = this.move(ui.startIdx, a === 'NextItem' ? 1 : -1, START_MENU.length);
+        if (next !== ui.startIdx) { ui.startIdx = next; this.play('UI-SND-002'); }
+      } else if (a === 'Confirm') {
+        if (START_MENU[ui.startIdx] === 'main_settings') this.openSettings();
+        else if (this.pending) this.pending.note = 'nem része ennek a szeletnek';
+      }
       return;
     }
 
@@ -157,9 +177,23 @@ export class SettingsApp {
         return;
       case 'Back':
         if (this.store.isDirty()) ui.modal = { kind: 'unsaved' };
-        else { ui.screen = 'closed'; this.play('UI-SND-006'); }
+        else { this.closeSettings(); this.play('UI-SND-006'); }
         return;
     }
+  }
+
+  private openSettings(): void {
+    const ui = this.ui;
+    ui.screen = 'settings';
+    ui.cat = 'audio';
+    ui.rowByCat.audio = 0; // UI-NAV-004: determinált kezdő fókusz
+    this.play('UI-SND-004');
+  }
+
+  /** Kilépés a nyitóoldalra; a fókusz a Beállítások menüponton marad. */
+  private closeSettings(): void {
+    this.ui.screen = 'start';
+    this.ui.startIdx = START_MENU.indexOf('main_settings');
   }
 
   private runModal(act: ModalAction): void {
@@ -167,8 +201,8 @@ export class SettingsApp {
     ui.modal = null; // a fókusz a kiváltó sorra tér vissza (4.1)
     switch (act) {
       case 'cancel': this.play('UI-SND-006'); return;
-      case 'discard': this.store.discard(); ui.screen = 'closed'; this.play('UI-SND-004'); return;
-      case 'apply': this.store.apply(); ui.screen = 'closed'; this.play('UI-SND-005'); return;
+      case 'discard': this.store.discard(); this.closeSettings(); this.play('UI-SND-004'); return;
+      case 'apply': this.store.apply(); this.closeSettings(); this.play('UI-SND-005'); return;
       case 'reset': this.store.resetCategory(ui.cat, ui.resetPolicy); this.play('UI-SND-004'); return;
     }
   }
@@ -181,7 +215,9 @@ export class SettingsApp {
     const root = document.documentElement;
     root.lang = this.ui.lang;
     this.stage.classList.toggle('readable', this.ui.readable);
-    this.stage.innerHTML = this.ui.screen === 'closed' ? this.closedHTML() : this.settingsHTML();
+    // Zene × Hangerő, a draftból — a csúszka mozgatása azonnal hallható, Elvetésnél visszaáll
+    this.music.volume = ((this.store.get('audio.music') as number) / 100) * ((this.store.get('audio.master') as number) / 100);
+    this.stage.innerHTML = this.ui.screen === 'start' ? this.startHTML() : this.settingsHTML();
     const target = this.stage.querySelector<HTMLElement>('[data-focus]');
     target?.focus({ preventScroll: true });
     this.renderDev();
@@ -274,10 +310,30 @@ export class SettingsApp {
       </div>`;
   }
 
-  private closedHTML(): string {
-    return `<div class="closed" tabindex="-1" data-focus>
-        <p class="closed-title">${this.L('proto/closed/title')}</p>
-        ${ctrlButton({ btn: 'A', label: this.L('proto/closed/hint') })}
+  /** Nyitóoldal (Figma 1:678): illusztráció, világos szegélydísz, cím + logó, menü, stúdiónév. */
+  private startHTML(): string {
+    const S = ASSETS_START;
+    const items = START_MENU.map((id: StartItem, i) => {
+      const on = i === this.ui.startIdx;
+      const deco = on ? '<span class="mi-shadow2" aria-hidden="true"></span><span class="mi-shadow1" aria-hidden="true"></span><span class="mi-bg" aria-hidden="true"></span>' : '';
+      return `<div class="menu-item${on ? ' is-focused' : ''}" role="menuitem" tabindex="-1" ${on ? 'data-focus' : ''}>
+          ${deco}<span class="mi-label">${this.L(id)}</span>
+          <span class="mi-corner" aria-hidden="true"><img alt="" src="${on ? S.cornerFocused : S.corner}"></span>
+        </div>`;
+    }).join('');
+    return `<div class="start">
+        <img class="start-bg" alt="" aria-hidden="true" src="${S.bg}">
+        <img class="side side-top" alt="" aria-hidden="true" src="${S.sideTop}">
+        <img class="side side-bottom" alt="" aria-hidden="true" src="${S.sideBottom}">
+        <div class="side side-v side-right" aria-hidden="true"><img alt="" src="${S.sideRight}"></div>
+        <div class="side side-v side-left" aria-hidden="true"><img alt="" src="${S.sideLeft}"></div>
+        <h1 class="start-heading" aria-label="The Assignment">
+          <span class="start-the" aria-hidden="true">The</span>
+          <img class="start-title" alt="" aria-hidden="true" src="${S.title}">
+        </h1>
+        <div class="start-logo-box" aria-hidden="true"><img class="start-logo" alt="" src="${S.logo}"></div>
+        <div class="start-menu" role="menu" aria-label="Main menu">${items}</div>
+        <p class="start-credit">ranagol</p>
       </div>`;
   }
 
@@ -312,7 +368,7 @@ export class SettingsApp {
 
   private renderDev(): void {
     const { ui, store } = this;
-    const stateName = ui.screen === 'closed' ? 'closed' : store.categoryState(ui.cat);
+    const stateName = ui.screen === 'start' ? 'start · ' + START_MENU[ui.startIdx] : store.categoryState(ui.cat);
     const ctx = this.context();
     const row = (id: string) => {
       const d = store.def(id);
@@ -341,6 +397,7 @@ export class SettingsApp {
         <label class="chk"><input type="checkbox" id="dev-readable" ${ui.readable ? 'checked' : ''}> Readable Font (Comic Neue → Inter + nagyobb méret)</label>
         <label class="chk"><input type="checkbox" id="dev-immediate" ${ui.resetPolicy === 'immediate' ? 'checked' : ''}> Reset azonnal ment <span class="muted">(nyitott policy)</span></label>
         <button id="dev-sound" class="wide">${this.sound.enabled ? 'Hang bekapcsolva ✓' : 'Hang bekapcsolása'}</button>
+        <p class="muted small">Háttérzene (Frost Ritual): ${this.music.playing ? '<b>szól</b>' : 'áll — egy billentyű vagy kattintás indítja (a gamepad-gombot a böngésző nem veszi gesztusnak)'}.</p>
         <p class="muted small">Kontroller: ${this.padConnected ? '<b>csatlakoztatva</b>' : 'nincs — nyomj meg rajta egy gombot'}.<br>
         Billentyű (csak fejlesztéshez): nyilak · Q/E = LB/RB · Enter = A · Esc = B · Y = Y</p>
       </div>
@@ -355,7 +412,7 @@ export class SettingsApp {
     on('dev-en', () => { ui.lang = 'en'; });
     on('dev-readable', () => { ui.readable = !ui.readable; }, 'change');
     on('dev-immediate', () => { ui.resetPolicy = ui.resetPolicy === 'draft' ? 'immediate' : 'draft'; }, 'change');
-    on('dev-sound', () => { this.sound.unlock(); setTimeout(() => this.renderDev(), 50); });
+    on('dev-sound', () => { this.sound.unlock(); this.startMusic(); setTimeout(() => this.renderDev(), 50); });
   }
 }
 

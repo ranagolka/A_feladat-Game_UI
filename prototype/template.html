@@ -70,13 +70,13 @@ body {
 .paper .topo { flex: none; position: relative; width: 1081px; height: 591px; opacity: .12; transform: rotate(-90deg); }
 .paper .topo > div { position: absolute; inset: 0; overflow: hidden; }
 .paper .topo img { position: absolute; left: -19.61%; top: 0; width: 119.61%; height: 123.02%; max-width: none; }
-.paper .side { position: absolute; display: block; max-width: none; }
-.paper .side-top { left: 60px; top: 0; width: 1800px; height: 48px; }
-.paper .side-bottom { left: 60px; bottom: 0; width: 1800px; height: 48px; }
-.paper .side-v { top: 60px; width: 48px; height: 960px; display: flex; align-items: center; justify-content: center; }
-.paper .side-v img { flex: none; width: 960px; height: 48px; max-width: none; }
-.paper .side-right { right: 0; } .paper .side-right img { transform: rotate(90deg); }
-.paper .side-left { left: 0; }  .paper .side-left img { transform: rotate(90deg) scaleY(-1); }
+.side { position: absolute; display: block; max-width: none; }
+.side-top { left: 60px; top: 0; width: 1800px; height: 48px; }
+.side-bottom { left: 60px; bottom: 0; width: 1800px; height: 48px; }
+.side-v { top: 60px; width: 48px; height: 960px; display: flex; align-items: center; justify-content: center; }
+.side-v img { flex: none; width: 960px; height: 48px; max-width: none; }
+.side-right { right: 0; } .side-right img { transform: rotate(90deg); }
+.side-left { left: 0; }  .side-left img { transform: rotate(90deg) scaleY(-1); }
 
 /* sraffozás — crosshatchActive: 192 px-es csempe, 48%-on, alapszín nélkül */
 .hatch { position: relative; }
@@ -185,8 +185,38 @@ body {
 .m-arrow { position: absolute; right: 42px; bottom: -48px; width: 48px; height: 56px; max-width: none; }
 .m-arrow-border { position: absolute; right: 39.24px; bottom: -52.92px; width: 51.32px; height: 62.28px; max-width: none; } /* 48×56 doboz, inset −2.43% −5.74% −8.79% −1.17% */
 
-.closed { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 30px; }
-.closed-title { text-transform: uppercase; margin: 0; font-size: 1.6em; font-weight: 700; letter-spacing: .04em; }
+/* Nyitóoldal (Figma 1:678) — teljes képernyős illusztráció, világos pageSideDecor, bal oldali menü */
+.start { position: absolute; inset: 0; overflow: hidden; color: #f9f8f8; } /* neutral/contrast/inverse/main */
+.start-bg { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; max-width: none; object-fit: cover; object-position: bottom; }
+.start-heading { margin: 0; font: inherit; }
+.start-the { position: absolute; left: 313px; top: 145px; transform: translateX(-50%); margin: 0; white-space: nowrap; color: #fff;
+  font-size: 28px; line-height: 28px; font-weight: 700; letter-spacing: 12.32px; text-transform: uppercase; } /* font-size/350 · line-height/350 */
+.start-title { position: absolute; left: 96px; top: 203px; width: 430px; height: 77px; max-width: none; }
+.start-logo-box { position: absolute; left: 313px; top: 320px; width: 72px; height: 102.947px; transform: translateX(-50%);
+  display: flex; align-items: center; justify-content: center; }
+.start-logo { flex: none; width: 102.947px; height: 72px; max-width: none; transform: rotate(90deg); }
+.start-credit { position: absolute; right: 96px; top: 942px; margin: 0; white-space: nowrap; color: #fff;
+  font-size: 28px; line-height: 1.2; font-weight: 700; letter-spacing: -.28px; text-transform: uppercase; }
+/* menü: 432 széles elemek 120 px-es lépésközzel (y 557 · 677 · 797) */
+.start-menu { position: absolute; left: 96px; top: 557px; width: 432px; display: grid; grid-auto-rows: 120px; align-items: start; }
+.menu-item { position: relative; display: flex; align-items: flex-end; gap: 16px; padding: 24px 24px 24px 32px;
+  border: 1.5px solid #f9f8f8; } /* border-width/regular · neutral/border/main-inverse */
+.menu-item .mi-label { position: relative; flex: 1 0 0; min-width: 0; font-size: 32px; line-height: 1.2; font-weight: 700;
+  letter-spacing: .64px; text-transform: uppercase; overflow-wrap: anywhere; }
+.menu-item .mi-corner { position: relative; flex: none; width: 16px; height: 16px; }
+.menu-item .mi-corner img { position: absolute; left: 0; top: 0; width: 16.75px; height: 16.75px; max-width: none; } /* inset 0 −4.69% −4.69% 0 */
+/* fókusz: papírlap 3 px navy kerettel + két sraffozott árnyék (mint a modalnál), piros felirat szorzó módban */
+.menu-item.is-focused { border: 0; color: #d01114; } /* Red */
+.menu-item .mi-shadow1, .menu-item .mi-shadow2 { position: absolute; pointer-events: none; transform: scaleX(-1);
+  background: url("__ASSET:crosshatch.png__") repeat 0 0 / 192px 192px; }
+.menu-item .mi-shadow2 { inset: 24px -8px -12px -8px; }
+.menu-item .mi-shadow1 { inset: 16px -16px -24px -16px; opacity: .8; }
+.menu-item .mi-bg { position: absolute; inset: 0; border: 3px solid var(--ink); transform: rotate(180deg); /* border-width/bold · primary/border/main */
+  background: var(--paper) url("__ASSET:paper.png__") repeat 0 0 / 248px 248px; }
+.menu-item.is-focused .mi-label, .menu-item.is-focused .mi-corner { mix-blend-mode: multiply; }
+.menu-item.is-focused .mi-corner img { width: 17.379px; height: 17.5px; } /* inset 0 −8.62% −9.37% 0 */
+#ui.readable .menu-item .mi-label { font-size: 36px; }
+
 
 /* ---------- fejlesztői panel ---------- */
 #dev { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
@@ -224,7 +254,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
 
 <div class="wrap">
   <header class="head">
-    <h1>A Feladat · Beállítások — Hang szelet</h1>
+    <h1>A Feladat · Nyitóoldal és Beállítások — Hang szelet</h1>
     <p>Settings UI prototípus · spec v1.0 · 1920 × 1080 referencia</p>
   </header>
   <div id="viewport">
@@ -247,6 +277,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
 
 <script>
 window.__ASSETS = { ring: "__ASSET:button-ring-1.5px.svg__", ringFocused: "__ASSET:button-ring-focused-1.5px.svg__", ringDisabled: "__ASSET:button-ring-disabled-1.5px.svg__", bumper: "__ASSET:bumper-lb.svg__" };
+window.__ASSETS_START = { bg: "__ASSET:start-bg.jpg__", sideTop: "__ASSET:start-side-top.svg__", sideBottom: "__ASSET:start-side-bottom.svg__", sideRight: "__ASSET:start-side-right.svg__", sideLeft: "__ASSET:start-side-left.svg__", title: "__ASSET:start-title.svg__", logo: "__ASSET:start-logo.svg__", corner: "__ASSET:start-corner.svg__", cornerFocused: "__ASSET:start-corner-focused.svg__" };
+window.__ASSETS_MUSIC = "__ASSET:music-frost-ritual-start.mp3__";
 window.__ASSETS_MODAL = { arrow: "__ASSET:modal-arrow.svg__", arrowBorder: "__ASSET:modal-arrow-border.svg__", shadowArrow: "__ASSET:modal-shadow-arrow.png__" };
 /*__BUNDLE__*/
 </script>

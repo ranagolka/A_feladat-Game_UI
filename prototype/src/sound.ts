@@ -70,3 +70,27 @@ export class SoundRouter {
     }
   }
 }
+
+/** Háttérzene: egyetlen loopolt sáv, a nyitóoldalon és a Beállításokban is szól.
+ *  A böngésző csak felhasználói gesztus (billentyű, kattintás) után enged lejátszást — a gamepad-gomb nem számít annak. */
+export class MusicPlayer {
+  private el: HTMLAudioElement;
+  private started = false;
+
+  constructor(src: string) {
+    this.el = new Audio(src);
+    this.el.loop = true;
+    this.el.preload = 'auto';
+  }
+
+  /** Master × Music, 0..1 — a hívó a draftból adja: élő előnézet (spec 6.1). */
+  set volume(v: number) { this.el.volume = Math.min(1, Math.max(0, v)); }
+
+  get playing(): boolean { return this.started && !this.el.paused; }
+
+  /** Indítási kísérlet; ha a böngésző még tiltja, a következő gesztusnál újrapróbálható. */
+  start(): Promise<boolean> {
+    if (this.playing) return Promise.resolve(true);
+    return this.el.play().then(() => (this.started = true), () => false);
+  }
+}

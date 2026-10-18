@@ -27,6 +27,8 @@ export interface SelectorSetting extends BaseSetting {
   kind: 'selector';
   options: { value: string; labelKey: string }[];
   default: string;
+  /** Körbeforgó léptetés: nincs határ, mindkét chevron aktív (Figma 27:10126 — kétértékű kapcsolók). */
+  wrap?: boolean;
 }
 
 export type SettingDef = SegmentedSetting | SelectorSetting;
@@ -44,7 +46,34 @@ export const SETTINGS: SettingDef[] = [
       { value: 'sound_system', labelKey: 'audio/speaker_type/option_values/value_3' },
     ],
   },
+
+  // Akadálymentesség (Figma 27:10126, UI-ACC-1-default). A címke, leírás és értékek a Language / Settings tokenjei.
+  // ⚑ NYITOTT: az alapértékek a Figma default képernyőjéről (minden Ki, Nyomvatartással); a kétértékű sor körbeforog.
+  toggle('accessibility.readable_font', 'accessibility/readable_font'),
+  toggle('accessibility.invert_speach_bubbles', 'accessibility/invert_speach_bubbles'),
+  {
+    kind: 'selector', id: 'accessibility.run_mode', category: 'accessibility', wrap: true, default: 'hold',
+    labelKey: 'accessibility/run_mode/label', descKey: 'accessibility/run_mode/description',
+    options: [
+      { value: 'hold', labelKey: 'accessibility/run_mode/value_1' },
+      { value: 'toggle', labelKey: 'accessibility/run_mode/value_2' },
+    ],
+  },
+  toggle('accessibility.jump_assist', 'accessibility/jump_assist'),
+  toggle('accessibility.mono_audio', 'accessibility/mono_audio'),
 ];
+
+/** Be/Ki kapcsoló az akadálymentességi fülre; a tokenekben value_1 = Be, value_2 = Ki. */
+function toggle(id: string, key: string): SelectorSetting {
+  return {
+    kind: 'selector', id, category: 'accessibility', wrap: true, default: 'off',
+    labelKey: `${key}/label`, descKey: `${key}/description`,
+    options: [
+      { value: 'on', labelKey: `${key}/value_1` },
+      { value: 'off', labelKey: `${key}/value_2` },
+    ],
+  };
+}
 
 export function settingsOf(cat: CategoryId, defs: SettingDef[] = SETTINGS): SettingDef[] {
   return defs.filter((d) => d.category === cat);

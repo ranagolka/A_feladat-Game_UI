@@ -46,7 +46,6 @@ interface UIState {
   rowByCat: Record<CategoryId, number>;
   modal: null | { kind: ModalKind };
   lang: Lang;
-  readable: boolean;
   resetPolicy: ResetPolicy;
 }
 
@@ -63,7 +62,6 @@ export class SettingsApp {
     rowByCat: { game: 0, graphics: 0, audio: 0, controller: 0, accessibility: 0 },
     modal: null,
     lang: 'hu',
-    readable: false,
     resetPolicy: 'draft',
   };
   log: LogEntry[] = [];
@@ -214,7 +212,8 @@ export class SettingsApp {
   render(): void {
     const root = document.documentElement;
     root.lang = this.ui.lang;
-    this.stage.classList.toggle('readable', this.ui.readable);
+    // Egyszerűsített betűtípus, a draftból — élő előnézet, Elvetésnél visszaáll (mint a hangerő)
+    this.stage.classList.toggle('readable', this.store.get('accessibility.readable_font') === 'on');
     // Zene × Hangerő, a draftból — a csúszka mozgatása azonnal hallható, Elvetésnél visszaáll
     this.music.volume = ((this.store.get('audio.music') as number) / 100) * ((this.store.get('audio.master') as number) / 100);
     this.stage.innerHTML = this.ui.screen === 'start' ? this.startHTML() : this.settingsHTML();
@@ -277,9 +276,8 @@ export class SettingsApp {
       aria = `role="slider" aria-valuemin="0" aria-valuemax="${d.options.length - 1}" aria-valuenow="${d.options.indexOf(opt)}" aria-valuetext="${label}"`;
     }
     return `<div class="row${focused ? ' is-focused hatch' : ''}${d.disabled ? ' is-disabled' : ''}" tabindex="-1" ${focused ? 'data-focus' : ''}
-        ${aria} aria-label="${this.L(d.labelKey)}" ${d.disabled ? 'aria-disabled="true"' : ''}>
-        <span class="marker" aria-hidden="true">&gt;</span>
-        <span class="label">${this.L(d.labelKey)}</span>
+        ${aria} aria-label="${this.L(d.labelKey)}" ${d.descKey ? `aria-description="${this.L(d.descKey)}"` : ''} ${d.disabled ? 'aria-disabled="true"' : ''}>
+        <span class="text"><span class="marker" aria-hidden="true">&gt;</span><span class="label">${this.L(d.labelKey)}</span>${d.descKey ? `<span class="desc">${this.L(d.descKey)}</span>` : ''}</span>
         <span class="control">${control}</span>
       </div>`;
   }
@@ -394,7 +392,6 @@ export class SettingsApp {
         <div class="seg-ctl" role="group" aria-label="Nyelv">
           <button id="dev-hu" aria-pressed="${ui.lang === 'hu'}">Magyar</button><button id="dev-en" aria-pressed="${ui.lang === 'en'}">English</button>
         </div>
-        <label class="chk"><input type="checkbox" id="dev-readable" ${ui.readable ? 'checked' : ''}> Readable Font (Comic Neue → Inter + nagyobb méret)</label>
         <label class="chk"><input type="checkbox" id="dev-immediate" ${ui.resetPolicy === 'immediate' ? 'checked' : ''}> Reset azonnal ment <span class="muted">(nyitott policy)</span></label>
         <button id="dev-sound" class="wide">${this.sound.enabled ? 'Hang bekapcsolva ✓' : 'Hang bekapcsolása'}</button>
         <p class="muted small">Háttérzene (Frost Ritual): ${this.music.playing ? '<b>szól</b>' : 'áll — egy billentyű vagy kattintás indítja (a gamepad-gombot a böngésző nem veszi gesztusnak)'}.</p>
@@ -410,7 +407,6 @@ export class SettingsApp {
       this.dev.querySelector(`#${id}`)?.addEventListener(ev, () => { fn(); this.render(); });
     on('dev-hu', () => { ui.lang = 'hu'; });
     on('dev-en', () => { ui.lang = 'en'; });
-    on('dev-readable', () => { ui.readable = !ui.readable; }, 'change');
     on('dev-immediate', () => { ui.resetPolicy = ui.resetPolicy === 'draft' ? 'immediate' : 'draft'; }, 'change');
     on('dev-sound', () => { this.sound.unlock(); this.startMusic(); setTimeout(() => this.renderDev(), 50); });
   }

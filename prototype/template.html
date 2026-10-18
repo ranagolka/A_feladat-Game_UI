@@ -120,8 +120,14 @@ body {
 .panel { position: absolute; top: 180px; left: 180px; right: 180px; bottom: 150px; display: flex; flex-direction: column; }
 .row { position: relative; min-height: 120px; display: grid; grid-template-columns: 120px minmax(0, 1fr) 600px;
   align-items: center; padding-right: 120px; }
-.row .marker { justify-self: end; margin-right: 6px; visibility: hidden; color: var(--red); font-weight: 700; position: relative; top: -2px; } /* optikai középre */
+/* címke + leírás (Figma SettingsOption): a leírás a fókuszban is tinta, normál; a ">" az első sorhoz igazodik */
+.row .text { grid-column: 2; max-width: 600px; position: relative; display: flex; flex-direction: column; min-width: 0; }
+.row .marker { position: absolute; right: 100%; top: -2px; margin-right: 6px; visibility: hidden; color: var(--red); font-weight: 700; line-height: 1.15; }
 .row .label { text-transform: uppercase; overflow-wrap: anywhere; line-height: 1.15; }
+.row .text:has(.desc) :is(.label, .marker) { line-height: 28px; } /* Settings/OptionLabels: 28/28 */
+.row .desc { font-size: 20px; line-height: 28px; font-weight: 400; color: var(--ink); overflow-wrap: anywhere; } /* Settings/Description */
+#ui.readable .row .text:has(.desc) :is(.label, .marker) { line-height: 1.15; }
+#ui.readable .row .desc { font-size: 24px; line-height: 1.3; }
 .row.is-focused { color: var(--red); }
 .row.is-focused .marker { visibility: visible; }
 .row.is-focused .label { font-weight: 700; }
@@ -254,7 +260,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
 
 <div class="wrap">
   <header class="head">
-    <h1>A Feladat · Nyitóoldal és Beállítások — Hang szelet</h1>
+    <h1>A Feladat · Nyitóoldal és Beállítások — Hang és Akadálymentesség szelet</h1>
     <p>Settings UI prototípus · spec v1.0 · 1920 × 1080 referencia</p>
   </header>
   <div id="viewport">

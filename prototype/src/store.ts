@@ -43,7 +43,8 @@ export class SettingsStore {
       next = Math.min(d.max, Math.max(d.min, (cur as number) + dir * d.step));
     } else {
       const i = d.options.findIndex((o) => o.value === cur);
-      const j = Math.min(d.options.length - 1, Math.max(0, i + dir));
+      const n = d.options.length;
+      const j = d.wrap ? (i + dir + n) % n : Math.min(n - 1, Math.max(0, i + dir));
       next = d.options[j].value;
     }
     if (next === cur) return false;
@@ -56,6 +57,7 @@ export class SettingsStore {
     const d = this.def(id);
     const cur = this.draft[id];
     if (d.kind === 'segmented') return dir < 0 ? cur === d.min : cur === d.max;
+    if (d.wrap) return false;
     const i = d.options.findIndex((o) => o.value === cur);
     return dir < 0 ? i <= 0 : i >= d.options.length - 1;
   }

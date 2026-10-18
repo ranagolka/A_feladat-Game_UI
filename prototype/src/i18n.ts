@@ -22,6 +22,38 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   'audio/speaker_type/option_values/value_2': { en: 'TV speakers', hu: 'TV hangszóró' },
   'audio/speaker_type/option_values/value_3': { en: 'Sound system', hu: 'Hangrendszer' },
 
+  // ⚠ a Figma HU értéke elírt („Egyszerűsitett") — itt javítva; a tokent a Figmában is javítani kell
+  'accessibility/readable_font/label': { en: 'Simplified font', hu: 'Egyszerűsített betűtípus' },
+  'accessibility/readable_font/description': {
+    en: 'Uses a larger, easier-to-read font throughout the game.',
+    hu: 'Nagyobb, könnyebben olvasható betűtípust használ a játékban.',
+  },
+  'accessibility/readable_font/value_1': { en: 'On', hu: 'Be' },
+  'accessibility/readable_font/value_2': { en: 'Off', hu: 'Ki' },
+  // ⚠ a 27:10126 képernyőn a leírás a Simplified font szövegének másolata — a token a helyes
+  'accessibility/invert_speach_bubbles/label': { en: 'Invert speach bubbles', hu: 'Inverz párbeszéd buborék' },
+  'accessibility/invert_speach_bubbles/description': {
+    en: 'Switches speech bubbles to a high-contrast dark style.',
+    hu: 'Sötét, kontrasztos megjelenésre váltja a beszédbuborékokat.',
+  },
+  'accessibility/invert_speach_bubbles/value_1': { en: 'On', hu: 'Be' },
+  'accessibility/invert_speach_bubbles/value_2': { en: 'Off', hu: 'Ki' },
+  'accessibility/run_mode/label': { en: 'Run mode', hu: 'Futás módja' },
+  'accessibility/run_mode/description': { en: 'Choose how to activate running.', hu: 'Válaszd ki a futás aktiválásának módját.' },
+  'accessibility/run_mode/value_1': { en: 'Hold to run', hu: 'Nyomvatartással' },
+  'accessibility/run_mode/value_2': { en: 'Toggle to run', hu: 'Ki / be kapcsolással' },
+  'accessibility/jump_assist/label': { en: 'Jump assist', hu: 'Ugrás rásegítés' },
+  'accessibility/jump_assist/description': { en: 'Makes jump timing more forgiving.', hu: 'Megkönnyíti az ugrások időzítését.' },
+  'accessibility/jump_assist/value_1': { en: 'On', hu: 'Be' },
+  'accessibility/jump_assist/value_2': { en: 'Off', hu: 'Ki' },
+  'accessibility/mono_audio/label': { en: 'Mono audio', hu: 'Mono hang' },
+  'accessibility/mono_audio/description': {
+    en: 'Plays the same sounds through both audio channels.',
+    hu: 'Mindkét hangcsatornán ugyanazokat a hangokat játssza le.',
+  },
+  'accessibility/mono_audio/value_1': { en: 'On', hu: 'Be' },
+  'accessibility/mono_audio/value_2': { en: 'Off', hu: 'Ki' },
+
   'actions/apply': { en: 'Apply', hu: 'Mentés' },
   'actions/reset': { en: 'Reset to default', hu: 'Alapértelmezett beállítások' },
   'actions/back': { en: 'Back', hu: 'Vissza' },
@@ -53,8 +85,8 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   'proto/hint/select': { en: 'Select', hu: 'Kiválasztás' },
   'proto/placeholder/title': { en: 'Not part of this slice', hu: 'Nem része ennek a szeletnek' },
   'proto/placeholder/body': {
-    en: 'The prototype implements the Audio tab first. LB / RB still switches category.',
-    hu: 'A prototípus először a Hang fület valósítja meg. Az LB / RB itt is kategóriát vált.',
+    en: 'The prototype implements the Audio and Accessibility tabs. LB / RB still switches category.',
+    hu: 'A prototípus a Hang és az Akadálymentesség fület valósítja meg. Az LB / RB itt is kategóriát vált.',
   },
   'proto/a11y/percent': { en: '{v} percent', hu: '{v} százalék' },
 };

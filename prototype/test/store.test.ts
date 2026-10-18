@@ -83,4 +83,27 @@ test('ha a draft visszaér a saved értékre, a dirty magától megszűnik', () 
   assert.equal(s.isDirty(), false);
 });
 
+test('Akadálymentesség: alapból minden Ki és Nyomvatartással, default/clean', () => {
+  const s = new SettingsStore();
+  assert.deepEqual(
+    ['readable_font', 'invert_speach_bubbles', 'run_mode', 'jump_assist', 'mono_audio'].map((k) => s.get(`accessibility.${k}`)),
+    ['off', 'off', 'hold', 'off', 'off'],
+  );
+  assert.equal(s.categoryState('accessibility'), 'default');
+});
+
+test('kétértékű kapcsoló körbeforog: nincs határ, mindkét irány vált', () => {
+  const s = new SettingsStore();
+  assert.equal(s.atBound('accessibility.jump_assist', -1), false);
+  assert.equal(s.atBound('accessibility.jump_assist', 1), false);
+  assert.equal(s.step('accessibility.jump_assist', 1), true);
+  assert.equal(s.get('accessibility.jump_assist'), 'on');
+  assert.equal(s.step('accessibility.jump_assist', 1), true);
+  assert.equal(s.get('accessibility.jump_assist'), 'off');
+  assert.equal(s.step('accessibility.run_mode', -1), true);
+  assert.equal(s.get('accessibility.run_mode'), 'toggle');
+  assert.equal(s.categoryState('accessibility'), 'modified_custom');
+  assert.equal(s.isCategoryDirty('audio'), false); // a kategóriák draftja független
+});
+
 console.log(`\n${passed} teszt átment.`);

@@ -125,4 +125,18 @@ test('grafika: a fényerő középről indul, ±50-nél megáll; a rázkódás T
   assert.equal(s.categoryState('graphics'), 'default');
 });
 
+test('kontroller: a rezgés Magasról (3) Kikapcsolva (0) fokig lép, a kiosztás Alapértelmezettről csak előre', () => {
+  const s = new SettingsStore();
+  assert.equal(s.get('controller.vibration'), 3);
+  assert.equal(s.atBound('controller.vibration', 1), true);
+  for (let i = 0; i < 3; i++) assert.equal(s.step('controller.vibration', -1), true);
+  assert.equal(s.get('controller.vibration'), 0);
+  assert.equal(s.step('controller.vibration', -1), false);
+  assert.equal(s.get('controller.layout'), 'default');
+  assert.equal(s.atBound('controller.layout', -1), true);
+  assert.equal(s.step('controller.layout', 1), true);
+  assert.equal(s.get('controller.layout'), 'alt_a');
+  assert.equal(s.categoryState('controller'), 'modified_custom');
+});
+
 console.log(`\n${passed} teszt átment.`);

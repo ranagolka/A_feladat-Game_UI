@@ -82,7 +82,7 @@ body {
 .hatch { position: relative; }
 .hatch::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .48;
   background: url("__ASSET:crosshatch.png__") repeat 0 0 / 192px 192px; }
-.hatch > :not(.frame):not(.ln):not(.shadow) { position: relative; }
+.hatch > :not(.frame):not(.ln):not(.shadow):not(.ctl-diagram) { position: relative; }
 
 /* kézzel húzott tuskeret: a szegély külön rétegen, torzító szűrővel — a szöveg éles marad */
 .frame { position: absolute; inset: 0; border: var(--bw) solid var(--ink-soft); pointer-events: none; filter: url(#rough); }
@@ -165,6 +165,23 @@ body {
 .gfx-scale > span { display: flex; height: 55px; }
 .gfx-scale i { flex: 1 0 0; min-width: 0; }
 .gfx-pic img, .gfx-scale > span { filter: brightness(var(--gfx-brightness, 1)); }
+
+/* Kiosztásábra (Figma UI-CON-1-default, 53:2283): a sor 600 px magas (300…900), az ábra kerete 1560×453 a sor tetejétől 133 px-re.
+   Kép 673×449 (440, 4) · vonalak + pontok SVG 841×449 (359.5, 4) · Controllerlabel: 32 px jel + 8 px + 28/28 felirat */
+.row.preview-controller { min-height: 600px; }
+.ctl-diagram { position: absolute; left: 0; top: 133px; width: 1560px; height: 453px; color: var(--ink); pointer-events: none; }
+.ctl-photo { position: absolute; left: 440px; top: 4px; width: 673px; height: 449px; max-width: none; }
+.ctl-lines { position: absolute; left: 359.5px; top: 4px; width: 841px; height: 449px; max-width: none; }
+.ctl-label { position: absolute; display: flex; align-items: center; gap: 8px; height: 32px; white-space: nowrap;
+  font-weight: 400; line-height: 28px; text-transform: uppercase; }
+.ctl-label.is-right { left: 1216px; }
+.ctl-label.is-left { right: 1212px; }
+.ctl-icon { position: relative; flex: none; width: 32px; height: 32px; }
+.ctl-icon img { position: absolute; left: 0; top: 0; max-width: none; }
+/* az export a renderelt határt adja: a kézzel rajzolt gyűrű ~1 px-rel kilóg a 32 px-es dobozból */
+.ctl-system-menu img, .ctl-system-screen img { left: -1.02px; top: -1.03px; width: 35px; height: 34px; }
+.ctl-stick-left img, .ctl-stick-right img { left: -.02px; width: 33px; height: 32px; }
+.ctl-dpad-left img, .ctl-dpad-down img, .ctl-dpad-right img { width: 32px; height: 32px; }
 .row.is-focused .value { font-weight: 700; }
 
 .placeholder { margin: 60px 120px; max-width: 900px; color: var(--neutral); line-height: 1.35; }
@@ -306,7 +323,11 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
 <script>
 window.__ASSETS = { ring: "__ASSET:button-ring-1.5px.svg__", ringFocused: "__ASSET:button-ring-focused-1.5px.svg__", ringDisabled: "__ASSET:button-ring-disabled-1.5px.svg__", bumper: "__ASSET:bumper-lb.svg__" };
 window.__ASSETS_START = { bg: "__ASSET:start-bg.jpg__", video: "__ASSET:start-bg.mp4__", sideTop: "__ASSET:start-side-top.svg__", sideBottom: "__ASSET:start-side-bottom.svg__", sideRight: "__ASSET:start-side-right.svg__", sideLeft: "__ASSET:start-side-left.svg__", title: "__ASSET:start-title.svg__", logo: "__ASSET:start-logo.svg__", corner: "__ASSET:start-corner.svg__", cornerFocused: "__ASSET:start-corner-focused.svg__" };
-window.__ASSETS_GFX = { preview: "__ASSET:gfx-preview.jpg__" };
+window.__ASSETS_CTL = { photo: "__ASSET:controller.webp__", lines: "__ASSET:controller-bindings.svg__", icons: {
+  "system-menu": "__ASSET:ctl-system-menu.svg__", "system-screen": "__ASSET:ctl-system-screen.svg__",
+  "stick-left": "__ASSET:ctl-stick-left.svg__", "stick-right": "__ASSET:ctl-stick-right.svg__",
+  "dpad-left": "__ASSET:ctl-dpad-left.svg__", "dpad-down": "__ASSET:ctl-dpad-down.svg__", "dpad-right": "__ASSET:ctl-dpad-right.svg__" } };
+window.__ASSETS_GFX ={ preview: "__ASSET:gfx-preview.jpg__" };
 window.__ASSETS_MUSIC ="__ASSET:music-frost-ritual-start.mp3__";
 window.__ASSETS_MODAL = { arrow: "__ASSET:modal-arrow.svg__", arrowBorder: "__ASSET:modal-arrow-border.svg__", shadowArrow: "__ASSET:modal-shadow-arrow.png__" };
 /*__BUNDLE__*/

@@ -28,6 +28,16 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   'graphics/screen_shake/value_2': { en: 'Reduced', hu: 'Csökkentett' },
   'graphics/screen_shake/value_3': { en: 'Full', hu: 'Teljes' },
 
+  'controller/vibration/label': { en: 'Vibration', hu: 'Vibráció erőssége' },
+  'controller/vibration/value_1': { en: 'Off', hu: 'Kikapcsolva' },
+  'controller/vibration/value_2': { en: 'Low', hu: 'Alacsony' },
+  'controller/vibration/value_3': { en: 'Medium', hu: 'Közepes' },
+  'controller/vibration/value_4': { en: 'High', hu: 'Magas' },
+  'controller/layout/label': { en: 'Controller layout', hu: 'Vezérlőkiosztás' },
+  'controller/layout/value_1': { en: 'Default', hu: 'Alapértelmezett' },
+  'controller/layout/value_2': { en: 'Alternative A', hu: 'Alternatív A' },
+  'controller/layout/value_3': { en: 'Alternative B', hu: 'Alternatív B' },
+
   // ⚠ a Figma HU értéke elírt („Egyszerűsitett") — itt javítva; a tokent a Figmában is javítani kell
   'accessibility/readable_font/label': { en: 'Simplified font', hu: 'Egyszerűsített betűtípus' },
   'accessibility/readable_font/description': {
@@ -87,12 +97,25 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   },
   'reset_defaults/actions/primary': { en: 'Reset', hu: 'Visszaállítás' },
 
+  // --- Figma 53:2283 kiosztásábra (Controllerlabel feliratok) — a Language / Settingsben még nincs token; a HU fordítás javaslat ---
+  'controller/bindings/settings': { en: 'Settings', hu: 'Beállítások' },
+  'controller/bindings/movement': { en: 'Movement', hu: 'Mozgás' },
+  'controller/bindings/change_weapon': { en: 'Change weapon', hu: 'Fegyverváltás' },
+  'controller/bindings/restore_health': { en: 'Restore health', hu: 'Gyógyulás' },
+  'controller/bindings/weapon_mode': { en: 'Weapon mode', hu: 'Fegyvermód' },
+  'controller/bindings/pause': { en: 'Pause / Menu', hu: 'Szünet / Menü' },
+  'controller/bindings/pick_up': { en: 'Pick up / grab', hu: 'Felvétel / fogás' }, // rövid: Egyszerűsített betűvel is a panelen belül marad
+  'controller/bindings/sneak': { en: 'Sneak toggle', hu: 'Lopakodás be / ki' },
+  'controller/bindings/jump': { en: 'Jump / Dodge', hu: 'Ugrás / kitérés' },
+  'controller/bindings/attack': { en: 'Attack', hu: 'Támadás' },
+  'controller/bindings/look': { en: 'Look around', hu: 'Körülnézés' },
+
   // --- csak a prototípushoz ---
   'proto/hint/select': { en: 'Select', hu: 'Kiválasztás' },
   'proto/placeholder/title': { en: 'Not part of this slice', hu: 'Nem része ennek a szeletnek' },
   'proto/placeholder/body': {
-    en: 'The prototype implements the Graphics, Audio and Accessibility tabs. LB / RB still switches category.',
-    hu: 'A prototípus a Grafika, a Hang és az Akadálymentesség fület valósítja meg. Az LB / RB itt is kategóriát vált.',
+    en: 'The prototype implements the Graphics, Audio, Controller and Accessibility tabs. LB / RB still switches category.',
+    hu: 'A prototípus a Grafika, a Hang, a Kontroller és az Akadálymentesség fület valósítja meg. Az LB / RB itt is kategóriát vált.',
   },
   'proto/a11y/percent': { en: '{v} percent', hu: '{v} százalék' },
 };

@@ -1,7 +1,7 @@
 // DEV-004/006/007 — Fókusz- és navigációs motor, ActionBar tri-state, modalfolyamok.
 import { CATEGORIES, CategoryId, SettingDef, settingsOf } from './schema';
 import { ResetPolicy, SettingsStore } from './store';
-import { Action, BINDINGS, Button, Context, InputAdapter } from './input';
+import { Action, BINDINGS, Button, Context, InputAdapter, RUMBLE_PREVIEW, rumble } from './input';
 import { Lang, t } from './i18n';
 import { MusicPlayer, SoundId, SoundRouter } from './sound';
 
@@ -14,7 +14,26 @@ const ASSETS = (window as unknown as { __ASSETS: { ring: string; ringFocused: st
 
 const ASSETS_GFX = (window as unknown as { __ASSETS_GFX: { preview: string } }).__ASSETS_GFX;
 
-const ASSETS_START =(window as unknown as { __ASSETS_START: Record<'bg' | 'video' | 'sideTop' | 'sideBottom' | 'sideRight' | 'sideLeft' | 'title' | 'logo' | 'corner' | 'cornerFocused', string> }).__ASSETS_START;
+type CtlIcon = 'system-menu' | 'system-screen' | 'stick-left' | 'stick-right' | 'dpad-left' | 'dpad-down' | 'dpad-right';
+const ASSETS_CTL = (window as unknown as { __ASSETS_CTL: { photo: string; lines: string; icons: Record<CtlIcon, string> } }).__ASSETS_CTL;
+
+/** Az Alapértelmezett kiosztás feliratai (Figma 53:2281 left · 53:2282 right). A „top" az ábra tetejétől mért px.
+ *  A betűs gombok a meglévő gombjelet (glyph) használják, a többi a Figma controller komponens SVG-je. */
+const CONTROLLER_BINDINGS: { side: 'left' | 'right'; top: number; icon: Glyph | CtlIcon; key: string }[] = [
+  { side: 'left', top: 50, icon: 'system-screen', key: 'controller/bindings/settings' },
+  { side: 'left', top: 139, icon: 'stick-left', key: 'controller/bindings/movement' },
+  { side: 'left', top: 222, icon: 'dpad-left', key: 'controller/bindings/change_weapon' },
+  { side: 'left', top: 291, icon: 'dpad-down', key: 'controller/bindings/restore_health' },
+  { side: 'left', top: 356, icon: 'dpad-right', key: 'controller/bindings/weapon_mode' },
+  { side: 'right', top: 0, icon: 'system-menu', key: 'controller/bindings/pause' },
+  { side: 'right', top: 89, icon: 'Y', key: 'controller/bindings/pick_up' },
+  { side: 'right', top: 154, icon: 'B', key: 'controller/bindings/sneak' },
+  { side: 'right', top: 217, icon: 'A', key: 'controller/bindings/jump' },
+  { side: 'right', top: 281, icon: 'X', key: 'controller/bindings/attack' },
+  { side: 'right', top: 369, icon: 'stick-right', key: 'controller/bindings/look' },
+];
+
+const ASSETS_START = (window as unknown as { __ASSETS_START: Record<'bg' | 'video' | 'sideTop' | 'sideBottom' | 'sideRight' | 'sideLeft' | 'title' | 'logo' | 'corner' | 'cornerFocused', string> }).__ASSETS_START;
 
 /** A nyitóoldal menüje (Figma 1:678, mainMenu komponens); az elemek a Language / Start tokenjei.
  *  Ebben a szeletben csak a Beállítások vezet tovább. */
@@ -186,8 +205,10 @@ export class SettingsApp {
       case 'DecreaseValue':
       case 'IncreaseValue': {
         const row = this.rows()[ui.rowByCat[ui.cat]];
-        if (row && this.store.step(row.id, a === 'IncreaseValue' ? 1 : -1)) this.play('UI-SND-003');
-        else if (this.pending) this.pending.note = 'határ — hang nyitott (UI-NAV-005)';
+        if (row && this.store.step(row.id, a === 'IncreaseValue' ? 1 : -1)) {
+          this.play('UI-SND-003');
+          if (row.id === 'controller.vibration') this.previewRumble();
+        } else if (this.pending) this.pending.note = 'határ — hang nyitott (UI-NAV-005)';
         return;
       }
       case 'ApplySettings':
@@ -201,6 +222,14 @@ export class SettingsApp {
         else { this.closeSettings(); this.play('UI-SND-006'); }
         return;
     }
+  }
+
+  /** Rezgés-előnézet: a kontroller az éppen beállított fokon rezdül egyet (a draftból, mint a hangerő előhallgatása). */
+  private previewRumble(): void {
+    const level = this.store.get('controller.vibration') as number;
+    const res = rumble(RUMBLE_PREVIEW.magnitudes[level]);
+    const note = { ok: `rezgés ${Math.round(RUMBLE_PREVIEW.magnitudes[level] * 100)}% · ${RUMBLE_PREVIEW.durationMs} ms`, off: 'rezgés ki', 'no-pad': 'rezgés: nincs kontroller', unsupported: 'rezgés: a böngésző nem támogatja' }[res];
+    if (this.pending) this.pending.note = note;
   }
 
   private openSettings(): void {
@@ -300,19 +329,37 @@ export class SettingsApp {
       const on = ((v as number) - d.min) / d.step;
       const segs = Array.from({ length: n }, (_, i) => `<span class="seg${i < on ? ' on' : ''}"></span>`).join('');
       control = `${chev('<', lo)}<span class="meter" aria-hidden="true">${segs}</span>${chev('>', hi)}`;
-      aria = `role="slider" aria-valuemin="${d.min}" aria-valuemax="${d.max}" aria-valuenow="${v}" aria-valuetext="${this.L('proto/a11y/percent', { v: v as number })}"`;
+      const text = d.valueKeys ? this.L(d.valueKeys[((v as number) - d.min) / d.step]) : this.L('proto/a11y/percent', { v: v as number });
+      aria = `role="slider" aria-valuemin="${d.min}" aria-valuemax="${d.max}" aria-valuenow="${v}" aria-valuetext="${text}"`;
     } else {
       const opt = d.options.find((o) => o.value === v)!;
       const label = this.L(opt.labelKey);
       control = `${chev('<', lo)}<span class="value">${label}</span>${chev('>', hi)}`;
       aria = `role="slider" aria-valuemin="0" aria-valuemax="${d.options.length - 1}" aria-valuenow="${d.options.indexOf(opt)}" aria-valuetext="${label}"`;
     }
-    const preview = d.kind === 'segmented' && d.preview === 'brightness' ? brightnessPreview(v as number) : '';
-    return `<div class="row${focused ? ' is-focused hatch' : ''}${d.disabled ? ' is-disabled' : ''}${preview ? ' has-preview' : ''}" tabindex="-1" ${focused ? 'data-focus' : ''}
-        ${aria} aria-label="${this.L(d.labelKey)}" ${d.descKey ? `aria-description="${this.L(d.descKey)}"` : ''} ${d.disabled ? 'aria-disabled="true"' : ''}>
+    const preview = d.preview === 'brightness' ? brightnessPreview(v as number) : d.preview === 'controller' ? this.controllerDiagram() : '';
+    const desc = d.preview === 'controller'
+      ? CONTROLLER_BINDINGS.map((b) => `${b.icon}: ${this.L(b.key)}`).join(', ') // az ábra tartalma felolvasóval
+      : d.descKey ? this.L(d.descKey) : '';
+    return `<div class="row${focused ? ' is-focused hatch' : ''}${d.disabled ? ' is-disabled' : ''}${preview ? ` has-preview preview-${d.preview}` : ''}" tabindex="-1" ${focused ? 'data-focus' : ''}
+        ${aria} aria-label="${this.L(d.labelKey)}" ${desc ? `aria-description="${desc}"` : ''} ${d.disabled ? 'aria-disabled="true"' : ''}>
         <span class="text"><span class="marker" aria-hidden="true">&gt;</span><span class="label">${this.L(d.labelKey)}</span>${d.descKey ? `<span class="desc">${this.L(d.descKey)}</span>` : ''}</span>
         <span class="control">${control}</span>${preview}
       </div>`;
+  }
+
+  /** Kiosztásábra (Figma 53:2283): kontrollerkép + vonalak/pontok (egy SVG-ben) + a két oldali Controllerlabel-oszlop. */
+  private controllerDiagram(): string {
+    const label = (b: typeof CONTROLLER_BINDINGS[number]) => {
+      const icon = b.icon.length === 1 ? glyph(b.icon as Glyph) : `<span class="ctl-icon ctl-${b.icon}" aria-hidden="true"><img alt="" src="${ASSETS_CTL.icons[b.icon as CtlIcon]}"></span>`;
+      const text = `<span class="cl-label">${this.L(b.key)}</span>`;
+      return `<span class="ctl-label is-${b.side}" style="top:${b.top}px">${b.side === 'left' ? text + icon : icon + text}</span>`;
+    };
+    return `<span class="ctl-diagram" aria-hidden="true">
+        <img class="ctl-photo" alt="" src="${ASSETS_CTL.photo}">
+        <img class="ctl-lines" alt="" src="${ASSETS_CTL.lines}">
+        ${CONTROLLER_BINDINGS.map(label).join('')}
+      </span>`;
   }
 
   private barItem(btn: 'A' | 'B' | 'Y', key: string): string {

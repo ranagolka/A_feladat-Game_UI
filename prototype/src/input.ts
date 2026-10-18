@@ -47,7 +47,24 @@ const DEV_KEYS: Record<string, Button> = {
   KeyQ: 'LB', KeyE: 'RB', Tab: 'Menu',
 };
 
-export type ButtonHandler = (b: Button, source: 'gamepad' | 'keyboard') => void;
+/** ⚑ NYITOTT: a rezgés-előnézet munkaértékei — fokonkénti erősség (Ki · Alacsony · Közepes · Magas) és impulzushossz. */
+export const RUMBLE_PREVIEW = { magnitudes: [0, 0.35, 0.65, 1], durationMs: 220 };
+
+export type RumbleResult = 'ok' | 'off' | 'no-pad' | 'unsupported';
+
+/** Egy rövid rezgés az első csatlakoztatott kontrolleren (Gamepad API, „dual-rumble": Chrome / Edge; Safari és Firefox nem támogatja). */
+export function rumble(magnitude: number, durationMs = RUMBLE_PREVIEW.durationMs): RumbleResult {
+  const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+  const pad = [...pads].find((p): p is Gamepad => !!p && p.connected);
+  if (!pad) return 'no-pad';
+  const act = pad.vibrationActuator as GamepadHapticActuator | null | undefined;
+  if (!act || typeof act.playEffect !== 'function') return 'unsupported';
+  if (magnitude <= 0) { void act.reset?.().catch(() => {}); return 'off'; } // Ki: a futó rezgést is leállítja
+  void act.playEffect('dual-rumble', { startDelay: 0, duration: durationMs, strongMagnitude: magnitude, weakMagnitude: magnitude }).catch(() => {});
+  return 'ok';
+}
+
+export type ButtonHandler =(b: Button, source: 'gamepad' | 'keyboard') => void;
 
 export class InputAdapter {
   private held = new Map<Button, { since: number; last: number }>();

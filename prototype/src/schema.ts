@@ -13,6 +13,8 @@ interface BaseSetting {
   labelKey: string;
   descKey?: string;
   disabled?: boolean;
+  /** A sor alatti előnézet: kép + szürkeskála (Figma UI-GFX-1-default) vagy a kontroller kiosztásábrája (UI-CON-1-default). */
+  preview?: 'brightness' | 'controller';
 }
 
 export interface SegmentedSetting extends BaseSetting {
@@ -23,8 +25,8 @@ export interface SegmentedSetting extends BaseSetting {
   default: number;
   /** Kétirányú csúszka (Figma SettingsInput type=bipolar-slider): középről balra/jobbra töltődik. */
   bipolar?: boolean;
-  /** A sor alatti előnézet (Figma UI-GFX-1-default: kép + szürkeskála). */
-  preview?: 'brightness';
+  /** Fokonkénti szöveg a felolvasóhoz (min…max sorrendben), ha a fokoknak neve van — pl. Ki / Alacsony / Közepes / Magas. */
+  valueKeys?: string[];
 }
 
 export interface SelectorSetting extends BaseSetting {
@@ -64,6 +66,25 @@ export const SETTINGS: SettingDef[] = [
       { value: 'off', labelKey: 'graphics/screen_shake/value_1' },
       { value: 'reduced', labelKey: 'graphics/screen_shake/value_2' },
       { value: 'full', labelKey: 'graphics/screen_shake/value_3' },
+    ],
+  },
+
+  // Kontroller (Figma 28:1709 UI-CON-1-default · 28:2646 UI-CON-2-default-layout).
+  // A rezgés szegmentált csúszka (3 szegmens = 4 fok), hogy látsszon, hány lehetőség van — szándékos tervdöntés a Figmában.
+  // A fokok neve a Language / Settings controller/vibration/value_1…4 tokenje (Ki · Alacsony · Közepes · Magas).
+  {
+    kind: 'segmented', id: 'controller.vibration', category: 'controller', labelKey: 'controller/vibration/label',
+    min: 0, max: 3, step: 1, default: 3,
+    valueKeys: [1, 2, 3, 4].map((i) => `controller/vibration/value_${i}`),
+  },
+  // ⚑ NYITOTT: csak az Alapértelmezett kiosztás van megtervezve; az Alternatív A / B ábrája egyelőre ugyanazt mutatja
+  {
+    kind: 'selector', id: 'controller.layout', category: 'controller', labelKey: 'controller/layout/label', default: 'default',
+    preview: 'controller',
+    options: [
+      { value: 'default', labelKey: 'controller/layout/value_1' },
+      { value: 'alt_a', labelKey: 'controller/layout/value_2' },
+      { value: 'alt_b', labelKey: 'controller/layout/value_3' },
     ],
   },
 

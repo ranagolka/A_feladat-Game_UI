@@ -21,6 +21,10 @@ export interface SegmentedSetting extends BaseSetting {
   max: number;
   step: number;
   default: number;
+  /** Kétirányú csúszka (Figma SettingsInput type=bipolar-slider): középről balra/jobbra töltődik. */
+  bipolar?: boolean;
+  /** A sor alatti előnézet (Figma UI-GFX-1-default: kép + szürkeskála). */
+  preview?: 'brightness';
 }
 
 export interface SelectorSetting extends BaseSetting {
@@ -44,6 +48,22 @@ export const SETTINGS: SettingDef[] = [
       { value: 'headphones', labelKey: 'audio/speaker_type/option_values/value_1' },
       { value: 'tv', labelKey: 'audio/speaker_type/option_values/value_2' },
       { value: 'sound_system', labelKey: 'audio/speaker_type/option_values/value_3' },
+    ],
+  },
+
+  // Grafika (Figma 28:8012, UI-GFX-1-default). A címke és az értékek a Language / Settings tokenjei.
+  // ⚑ NYITOTT: a fényerő tartománya és lépésköze — a terv 5+5 szegmense szerint −50…+50, 10-es lépés, alapérték 0 (közép).
+  {
+    kind: 'segmented', id: 'graphics.brightness', category: 'graphics', labelKey: 'graphics/brightness/label',
+    min: -50, max: 50, step: 10, default: 0, bipolar: true, preview: 'brightness',
+  },
+  // ⚑ NYITOTT: alapérték a terv default képernyőjéről (Teljes); nem forog körbe, mint a hangszóró-típus
+  {
+    kind: 'selector', id: 'graphics.screen_shake', category: 'graphics', labelKey: 'graphics/screen_shake/label', default: 'full',
+    options: [
+      { value: 'off', labelKey: 'graphics/screen_shake/value_1' },
+      { value: 'reduced', labelKey: 'graphics/screen_shake/value_2' },
+      { value: 'full', labelKey: 'graphics/screen_shake/value_3' },
     ],
   },
 

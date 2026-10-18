@@ -144,7 +144,27 @@ body {
 .seg.on::after { content: ""; display: block; height: 8px; background: currentColor; }
 /* a kitöltött/üres GEOMETRIA viszi a mennyiséget, nem csak a szín (spec 9.2) */
 .row:not(.is-focused) .meter { color: var(--ink); }
+/* bipolar-slider (Figma 22:3070) — 5 + 5 szegmens, köztük 42 px-es „I" középjel, mindkét oldalon −4 px átfedéssel */
+.meter.bipolar { align-items: center; height: 28px; }
+.meter.bipolar .half { flex: 1 0 0; min-width: 0; display: flex; }
+.meter.bipolar .mid { flex: none; margin: 0 -4px; font-size: 42px; line-height: 28px; font-weight: 400; text-transform: uppercase; position: relative; z-index: 1; }
 .value { white-space: nowrap; }
+
+/* Előnézetes sor (Figma UI-GFX-1-default): 480 px magas, a címke és a csúszka a tetején marad (46 px, mint a 120 px-es sorban),
+   alatta a kép (528×263) és a szürkeskála (528×71) a chevronok közé igazítva; 24 / 16 / 32 px-es közök */
+.row.has-preview { align-items: start; padding-top: 46px; padding-bottom: 32px; }
+.row.has-preview :is(.label, .marker) { line-height: 28px; } /* Settings/OptionLabels: 28/28 — így az első rács-sor 28 px, mint a csúszka */
+#ui.readable .row.has-preview :is(.label, .marker) { line-height: 1.15; }
+.row.has-preview .control { height: 28px; }
+.gfx-preview { grid-column: 3; grid-row: 2; margin: 24px 36px 0; display: flex; flex-direction: column; gap: 16px; color: var(--ink); }
+.gfx-pic, .gfx-scale { position: relative; box-sizing: border-box; padding: 5px; background: #f0f0ea; border: 3px solid var(--ink); } /* Figma: var(--paper, #f0f0ea), primary/border/main */
+.gfx-pic { height: 263px; }
+.gfx-pic > span { position: relative; display: block; height: 247px; overflow: hidden; }
+.gfx-pic img { position: absolute; left: 0; top: -12.96%; width: 100%; height: 116.66%; max-width: none; }
+.gfx-scale { height: 71px; }
+.gfx-scale > span { display: flex; height: 55px; }
+.gfx-scale i { flex: 1 0 0; min-width: 0; }
+.gfx-pic img, .gfx-scale > span { filter: brightness(var(--gfx-brightness, 1)); }
 .row.is-focused .value { font-weight: 700; }
 
 .placeholder { margin: 60px 120px; max-width: 900px; color: var(--neutral); line-height: 1.35; }
@@ -286,7 +306,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
 <script>
 window.__ASSETS = { ring: "__ASSET:button-ring-1.5px.svg__", ringFocused: "__ASSET:button-ring-focused-1.5px.svg__", ringDisabled: "__ASSET:button-ring-disabled-1.5px.svg__", bumper: "__ASSET:bumper-lb.svg__" };
 window.__ASSETS_START = { bg: "__ASSET:start-bg.jpg__", video: "__ASSET:start-bg.mp4__", sideTop: "__ASSET:start-side-top.svg__", sideBottom: "__ASSET:start-side-bottom.svg__", sideRight: "__ASSET:start-side-right.svg__", sideLeft: "__ASSET:start-side-left.svg__", title: "__ASSET:start-title.svg__", logo: "__ASSET:start-logo.svg__", corner: "__ASSET:start-corner.svg__", cornerFocused: "__ASSET:start-corner-focused.svg__" };
-window.__ASSETS_MUSIC = "__ASSET:music-frost-ritual-start.mp3__";
+window.__ASSETS_GFX = { preview: "__ASSET:gfx-preview.jpg__" };
+window.__ASSETS_MUSIC ="__ASSET:music-frost-ritual-start.mp3__";
 window.__ASSETS_MODAL = { arrow: "__ASSET:modal-arrow.svg__", arrowBorder: "__ASSET:modal-arrow-border.svg__", shadowArrow: "__ASSET:modal-shadow-arrow.png__" };
 /*__BUNDLE__*/
 </script>

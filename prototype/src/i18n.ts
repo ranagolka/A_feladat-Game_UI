@@ -22,6 +22,12 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   'audio/speaker_type/option_values/value_2': { en: 'TV speakers', hu: 'TV hangszóró' },
   'audio/speaker_type/option_values/value_3': { en: 'Sound system', hu: 'Hangrendszer' },
 
+  'graphics/brightness/label': { en: 'Brightness', hu: 'Fényerő' },
+  'graphics/screen_shake/label': { en: 'Screen shake', hu: 'Képernyőrázkódás' },
+  'graphics/screen_shake/value_1': { en: 'Off', hu: 'Kikapcsolva' },
+  'graphics/screen_shake/value_2': { en: 'Reduced', hu: 'Csökkentett' },
+  'graphics/screen_shake/value_3': { en: 'Full', hu: 'Teljes' },
+
   // ⚠ a Figma HU értéke elírt („Egyszerűsitett") — itt javítva; a tokent a Figmában is javítani kell
   'accessibility/readable_font/label': { en: 'Simplified font', hu: 'Egyszerűsített betűtípus' },
   'accessibility/readable_font/description': {
@@ -85,8 +91,8 @@ const STRINGS: Record<string, Record<Lang, string>> = {
   'proto/hint/select': { en: 'Select', hu: 'Kiválasztás' },
   'proto/placeholder/title': { en: 'Not part of this slice', hu: 'Nem része ennek a szeletnek' },
   'proto/placeholder/body': {
-    en: 'The prototype implements the Audio and Accessibility tabs. LB / RB still switches category.',
-    hu: 'A prototípus a Hang és az Akadálymentesség fület valósítja meg. Az LB / RB itt is kategóriát vált.',
+    en: 'The prototype implements the Graphics, Audio and Accessibility tabs. LB / RB still switches category.',
+    hu: 'A prototípus a Grafika, a Hang és az Akadálymentesség fület valósítja meg. Az LB / RB itt is kategóriát vált.',
   },
   'proto/a11y/percent': { en: '{v} percent', hu: '{v} százalék' },
 };

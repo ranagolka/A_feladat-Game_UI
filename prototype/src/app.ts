@@ -12,7 +12,9 @@ const ASSETS_MODAL = (window as unknown as { __ASSETS_MODAL: { arrow: string; ar
 /** A Figma-eszközök data: URI-jai — a build tölti ki (template: window.__ASSETS). */
 const ASSETS = (window as unknown as { __ASSETS: { ring: string; ringFocused: string; ringDisabled: string; bumper: string } }).__ASSETS;
 
-const ASSETS_START = (window as unknown as { __ASSETS_START: Record<'bg' | 'video' | 'sideTop' | 'sideBottom' | 'sideRight' | 'sideLeft' | 'title' | 'logo' | 'corner' | 'cornerFocused', string> }).__ASSETS_START;
+const ASSETS_GFX = (window as unknown as { __ASSETS_GFX: { preview: string } }).__ASSETS_GFX;
+
+const ASSETS_START =(window as unknown as { __ASSETS_START: Record<'bg' | 'video' | 'sideTop' | 'sideBottom' | 'sideRight' | 'sideLeft' | 'title' | 'logo' | 'corner' | 'cornerFocused', string> }).__ASSETS_START;
 
 /** A nyitóoldal menüje (Figma 1:678, mainMenu komponens); az elemek a Language / Start tokenjei.
  *  Ebben a szeletben csak a Beállítások vezet tovább. */
@@ -285,7 +287,15 @@ export class SettingsApp {
     const hi = this.store.atBound(d.id, 1);
     let control: string;
     let aria: string;
-    if (d.kind === 'segmented') {
+    if (d.kind === 'segmented' && d.bipolar) {
+      // Figma 22:3070 — 5 + 5 szegmens, köztük az „I" középjel; a kitöltés a középtől kifelé nő
+      const half = (d.max - d.min) / d.step / 2;
+      const k = (v as number) / d.step; // előjeles lépésszám a középtől
+      const left = Array.from({ length: half }, (_, i) => `<span class="seg${k <= -(half - i) ? ' on' : ''}"></span>`).join('');
+      const right = Array.from({ length: half }, (_, i) => `<span class="seg${k >= i + 1 ? ' on' : ''}"></span>`).join('');
+      control = `${chev('<', lo)}<span class="meter bipolar" aria-hidden="true"><span class="half">${left}</span><span class="mid">i</span><span class="half">${right}</span></span>${chev('>', hi)}`;
+      aria = `role="slider" aria-valuemin="${d.min}" aria-valuemax="${d.max}" aria-valuenow="${v}" aria-valuetext="${(v as number) > 0 ? '+' : ''}${v}"`;
+    } else if (d.kind === 'segmented') {
       const n = (d.max - d.min) / d.step;
       const on = ((v as number) - d.min) / d.step;
       const segs = Array.from({ length: n }, (_, i) => `<span class="seg${i < on ? ' on' : ''}"></span>`).join('');
@@ -297,10 +307,11 @@ export class SettingsApp {
       control = `${chev('<', lo)}<span class="value">${label}</span>${chev('>', hi)}`;
       aria = `role="slider" aria-valuemin="0" aria-valuemax="${d.options.length - 1}" aria-valuenow="${d.options.indexOf(opt)}" aria-valuetext="${label}"`;
     }
-    return `<div class="row${focused ? ' is-focused hatch' : ''}${d.disabled ? ' is-disabled' : ''}" tabindex="-1" ${focused ? 'data-focus' : ''}
+    const preview = d.kind === 'segmented' && d.preview === 'brightness' ? brightnessPreview(v as number) : '';
+    return `<div class="row${focused ? ' is-focused hatch' : ''}${d.disabled ? ' is-disabled' : ''}${preview ? ' has-preview' : ''}" tabindex="-1" ${focused ? 'data-focus' : ''}
         ${aria} aria-label="${this.L(d.labelKey)}" ${d.descKey ? `aria-description="${this.L(d.descKey)}"` : ''} ${d.disabled ? 'aria-disabled="true"' : ''}>
         <span class="text"><span class="marker" aria-hidden="true">&gt;</span><span class="label">${this.L(d.labelKey)}</span>${d.descKey ? `<span class="desc">${this.L(d.descKey)}</span>` : ''}</span>
-        <span class="control">${control}</span>
+        <span class="control">${control}</span>${preview}
       </div>`;
   }
 
@@ -455,6 +466,19 @@ function ctrlButton(o: { btn: Glyph; label: string; state?: BtnState; align?: 'l
 
 function bumper(label: 'LB' | 'RB'): string {
   return `<span class="bumper ${label.toLowerCase()}" aria-hidden="true"><img alt="" src="${ASSETS.bumper}"><span>${label}</span></span>`;
+}
+
+/** A szürkeskála fokai (Figma neutral/scale/*: #111110 ennyi %-os fedéssel; a terv sorában nincs 90). */
+const GREY_SCALE = [0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 95, 100];
+
+/** Fényerő-előnézet (Figma 28:9014 pic · 28:9016 picBG · 28:9021 greyScale).
+ *  ⚑ NYITOTT: az élő hatás munkaértéke — a draft értéke CSS brightness()-ként, ±50 → 0,5…1,5. */
+function brightnessPreview(v: number): string {
+  const cells = GREY_SCALE.map((a) => `<i style="background:rgba(17,17,16,${a / 100})"></i>`).join('');
+  return `<span class="gfx-preview" aria-hidden="true" style="--gfx-brightness:${1 + v / 100}">
+      <span class="gfx-pic"><span><img alt="" src="${ASSETS_GFX.preview}"></span></span>
+      <span class="gfx-scale"><span>${cells}</span></span>
+    </span>`;
 }
 
 function chev(dir: '<' | '>', disabled: boolean): string {

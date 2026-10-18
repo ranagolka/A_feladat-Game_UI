@@ -106,4 +106,23 @@ test('kétértékű kapcsoló körbeforog: nincs határ, mindkét irány vált',
   assert.equal(s.isCategoryDirty('audio'), false); // a kategóriák draftja független
 });
 
+test('grafika: a fényerő középről indul, ±50-nél megáll; a rázkódás Teljesről csak lefelé léptethető', () => {
+  const s = new SettingsStore();
+  assert.equal(s.get('graphics.brightness'), 0);
+  assert.equal(s.categoryState('graphics'), 'default');
+  for (let i = 0; i < 5; i++) assert.equal(s.step('graphics.brightness', -1), true);
+  assert.equal(s.get('graphics.brightness'), -50);
+  assert.equal(s.step('graphics.brightness', -1), false);
+  assert.equal(s.atBound('graphics.brightness', -1), true);
+  assert.equal(s.get('graphics.screen_shake'), 'full');
+  assert.equal(s.atBound('graphics.screen_shake', 1), true);
+  assert.equal(s.step('graphics.screen_shake', -1), true);
+  assert.equal(s.get('graphics.screen_shake'), 'reduced');
+  assert.equal(s.categoryState('graphics'), 'modified_custom');
+  assert.equal(s.canReset('graphics'), true);
+  s.resetCategory('graphics', 'draft');
+  assert.equal(s.get('graphics.brightness'), 0);
+  assert.equal(s.categoryState('graphics'), 'default');
+});
+
 console.log(`\n${passed} teszt átment.`);

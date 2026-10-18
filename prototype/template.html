@@ -275,6 +275,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
         <div class="side side-v side-right"><img alt="" src="__ASSET:side-right.svg__"></div>
         <div class="side side-v side-left"><img alt="" src="__ASSET:side-left.svg__"></div>
       </div>
+      <!-- a nyitóoldal háttérvideója: tartós elem, hogy az újrarajzolás ne indítsa újra; az app kapcsolja -->
+      <video class="start-bg" id="start-video" muted loop playsinline preload="auto" aria-hidden="true" hidden></video>
       <div id="ui" aria-label="Beállítások"></div>
     </div>
   </div>
@@ -283,7 +285,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
 
 <script>
 window.__ASSETS = { ring: "__ASSET:button-ring-1.5px.svg__", ringFocused: "__ASSET:button-ring-focused-1.5px.svg__", ringDisabled: "__ASSET:button-ring-disabled-1.5px.svg__", bumper: "__ASSET:bumper-lb.svg__" };
-window.__ASSETS_START = { bg: "__ASSET:start-bg.jpg__", sideTop: "__ASSET:start-side-top.svg__", sideBottom: "__ASSET:start-side-bottom.svg__", sideRight: "__ASSET:start-side-right.svg__", sideLeft: "__ASSET:start-side-left.svg__", title: "__ASSET:start-title.svg__", logo: "__ASSET:start-logo.svg__", corner: "__ASSET:start-corner.svg__", cornerFocused: "__ASSET:start-corner-focused.svg__" };
+window.__ASSETS_START = { bg: "__ASSET:start-bg.jpg__", video: "__ASSET:start-bg.mp4__", sideTop: "__ASSET:start-side-top.svg__", sideBottom: "__ASSET:start-side-bottom.svg__", sideRight: "__ASSET:start-side-right.svg__", sideLeft: "__ASSET:start-side-left.svg__", title: "__ASSET:start-title.svg__", logo: "__ASSET:start-logo.svg__", corner: "__ASSET:start-corner.svg__", cornerFocused: "__ASSET:start-corner-focused.svg__" };
 window.__ASSETS_MUSIC = "__ASSET:music-frost-ritual-start.mp3__";
 window.__ASSETS_MODAL = { arrow: "__ASSET:modal-arrow.svg__", arrowBorder: "__ASSET:modal-arrow-border.svg__", shadowArrow: "__ASSET:modal-shadow-arrow.png__" };
 /*__BUNDLE__*/

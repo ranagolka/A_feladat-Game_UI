@@ -8,7 +8,7 @@ const out = await build({
 });
 const js = out.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
 // A Figma-eszközök data: URI-ként ágyazódnak be (az Artifact csak beágyazott képet enged).
-const mime = { png: 'image/png', jpg: 'image/jpeg', mp3: 'audio/mpeg', svg: 'image/svg+xml', ttf: 'font/ttf' };
+const mime = { png: 'image/png', jpg: 'image/jpeg', mp3: 'audio/mpeg', mp4: 'video/mp4', svg: 'image/svg+xml', ttf: 'font/ttf' };
 const html = readFileSync('template.html', 'utf8')
   .replace(/__ASSET:([\w.-]+)__/g, (_, f) => {
     const ext = f.split('.').pop();

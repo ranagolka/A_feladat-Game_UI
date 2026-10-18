@@ -12,7 +12,7 @@ const ASSETS_MODAL = (window as unknown as { __ASSETS_MODAL: { arrow: string; ar
 /** A Figma-eszközök data: URI-jai — a build tölti ki (template: window.__ASSETS). */
 const ASSETS = (window as unknown as { __ASSETS: { ring: string; ringFocused: string; ringDisabled: string; bumper: string } }).__ASSETS;
 
-const ASSETS_START = (window as unknown as { __ASSETS_START: Record<'bg' | 'sideTop' | 'sideBottom' | 'sideRight' | 'sideLeft' | 'title' | 'logo' | 'corner' | 'cornerFocused', string> }).__ASSETS_START;
+const ASSETS_START = (window as unknown as { __ASSETS_START: Record<'bg' | 'video' | 'sideTop' | 'sideBottom' | 'sideRight' | 'sideLeft' | 'title' | 'logo' | 'corner' | 'cornerFocused', string> }).__ASSETS_START;
 
 /** A nyitóoldal menüje (Figma 1:678, mainMenu komponens); az elemek a Language / Start tokenjei.
  *  Ebben a szeletben csak a Beállítások vezet tovább. */
@@ -68,6 +68,7 @@ export class SettingsApp {
   private pending: LogEntry | null = null;
   private padConnected = false;
   private fontDiag = 'mérés folyamatban…';
+  private video = document.getElementById('start-video') as HTMLVideoElement | null;
 
   constructor(private stage: HTMLElement, private dev: HTMLElement) {
     this.sound.onPlay = (id) => { if (this.pending) this.pending.sound = id; };
@@ -79,6 +80,7 @@ export class SettingsApp {
       (c) => { this.padConnected = c; this.renderDev(); },
     ).start();
     this.stage.addEventListener('pointerdown', () => { this.sound.unlock(); this.startMusic(); });
+    void this.loadVideo();
     this.render();
     this.startMusic(); // ha a böngésző engedi az autoplayt, rögtön szól
     void this.measureFonts();
@@ -99,6 +101,25 @@ export class SettingsApp {
     this.log.length = Math.min(this.log.length, 8);
     this.pending = null;
     this.render();
+  }
+
+  /** A beágyazott videó blob URL-ről indul: a nagy data: URI-t nem minden böngésző játssza le / loopolja megbízhatóan. */
+  private async loadVideo(): Promise<void> {
+    const v = this.video;
+    if (!v) return;
+    v.poster = ASSETS_START.bg; // betöltésig és csökkentett mozgásnál az állókép látszik
+    try { v.src = URL.createObjectURL(await (await fetch(ASSETS_START.video)).blob()); } catch { v.src = ASSETS_START.video; }
+    this.syncVideo();
+  }
+
+  /** Csak a nyitóoldalon látszik és fut; prefers-reduced-motion esetén állókép marad. */
+  private syncVideo(): void {
+    const v = this.video;
+    if (!v) return;
+    const on = this.ui.screen === 'start';
+    v.hidden = !on;
+    if (on && v.src && !matchMedia('(prefers-reduced-motion: reduce)').matches) void v.play().catch(() => {});
+    else v.pause();
   }
 
   private startMusic(): void {
@@ -217,6 +238,7 @@ export class SettingsApp {
     // Zene × Hangerő, a draftból — a csúszka mozgatása azonnal hallható, Elvetésnél visszaáll
     this.music.volume = ((this.store.get('audio.music') as number) / 100) * ((this.store.get('audio.master') as number) / 100);
     this.stage.innerHTML = this.ui.screen === 'start' ? this.startHTML() : this.settingsHTML();
+    this.syncVideo();
     const target = this.stage.querySelector<HTMLElement>('[data-focus]');
     target?.focus({ preventScroll: true });
     this.renderDev();
@@ -308,7 +330,7 @@ export class SettingsApp {
       </div>`;
   }
 
-  /** Nyitóoldal (Figma 1:678): illusztráció, világos szegélydísz, cím + logó, menü, stúdiónév. */
+  /** Nyitóoldal (Figma 1:678): a háttér a tartós #start-video (alatta), erre jön a világos szegélydísz, cím + logó, menü, stúdiónév. */
   private startHTML(): string {
     const S = ASSETS_START;
     const items = START_MENU.map((id: StartItem, i) => {
@@ -320,7 +342,6 @@ export class SettingsApp {
         </div>`;
     }).join('');
     return `<div class="start">
-        <img class="start-bg" alt="" aria-hidden="true" src="${S.bg}">
         <img class="side side-top" alt="" aria-hidden="true" src="${S.sideTop}">
         <img class="side side-bottom" alt="" aria-hidden="true" src="${S.sideBottom}">
         <div class="side side-v side-right" aria-hidden="true"><img alt="" src="${S.sideRight}"></div>

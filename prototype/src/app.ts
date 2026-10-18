@@ -90,6 +90,7 @@ export class SettingsApp {
   private padConnected = false;
   private fontDiag = 'mérés folyamatban…';
   private video = document.getElementById('start-video') as HTMLVideoElement | null;
+  private paper = document.getElementById('paper');
 
   constructor(private stage: HTMLElement, private dev: HTMLElement) {
     this.sound.onPlay = (id) => { if (this.pending) this.pending.sound = id; };
@@ -270,6 +271,7 @@ export class SettingsApp {
     this.stage.classList.toggle('readable', this.store.get('accessibility.readable_font') === 'on');
     // Zene × Hangerő, a draftból — a csúszka mozgatása azonnal hallható, Elvetésnél visszaáll
     this.music.volume = ((this.store.get('audio.music') as number) / 100) * ((this.store.get('audio.master') as number) / 100);
+    this.paper?.setAttribute('data-topo', this.ui.cat); // a topográfiai háttérelem fülenként más (Figma)
     this.stage.innerHTML = this.ui.screen === 'start' ? this.startHTML() : this.settingsHTML();
     this.syncVideo();
     const target = this.stage.querySelector<HTMLElement>('[data-focus]');

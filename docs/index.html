@@ -56,7 +56,7 @@ body {
 
 /* Háttér — a Figma „UI-AUD-1-default" rétegei, a saját eszközeivel (assets/):
    papírcsempe 248 px · rácsmetszéspontok (4 × 56 px kar + 2 px pont) rombusz-maszkkal (közép 15%) ·
-   topomap 12%-on, jobbra elforgatva · pageSideDecor a négy szélen. Passzerjel nincs. */
+   topomap 12%-on, fülenként más helyen · pageSideDecor a négy szélen. Passzerjel nincs. */
 .paper { position: absolute; inset: 0; pointer-events: none; overflow: hidden;
   background: var(--paper) url("assets/paper.png?v=13b120d3") repeat 0 0 / 248px 248px; }
 .paper .masked { position: absolute; left: 0; top: 0; width: 1921px; height: 1081px;
@@ -66,10 +66,22 @@ body {
 .paper .grid .av { width: .75px; height: 56px; background: url("assets/grid-arm-v.svg?v=4116e2cb") no-repeat 0 0 / 100% 100%; transform: scaleY(-1); }
 .paper .grid .ah { width: 56px; height: .75px; background: url("assets/grid-arm-h.svg?v=6879f94f") no-repeat 0 0 / 100% 100%; }
 .paper .grid .dot { width: 2px; height: 2px; background: var(--neutral); }
-.paper .topo-wrap { position: absolute; right: 0; top: 0; width: 591px; height: 1081px; display: flex; align-items: center; justify-content: center; }
-.paper .topo { flex: none; position: relative; width: 1081px; height: 591px; opacity: .12; transform: rotate(-90deg); }
-.paper .topo > div { position: absolute; inset: 0; overflow: hidden; }
-.paper .topo img { position: absolute; left: -19.61%; top: 0; width: 119.61%; height: 123.02%; max-width: none; }
+/* topomap — fülenként más (szándékos, Figma): a csomópont mérete + a Figma transzformációs mátrixa (a vászonhoz képest)
+   + a kép CROP-kivágása (szélesség = 100% / skála, eltolás = −eltolás / skála). 12%-os fedés, a rácsmaszk alatt. */
+.paper .topo { position: absolute; left: 0; top: 0; transform-origin: 0 0; opacity: .12; overflow: hidden; }
+.paper .topo img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; max-width: none; }
+/* Hang (Figma 28:8000) — jobb szél, −90° · a Játék fülnek még nincs terve, addig ezt kapja */
+.paper:is([data-topo="audio"], [data-topo="game"]) .topo { width: 1081px; height: 591px; transform: matrix(0, -1, 1, 0, 1329, 1081); }
+.paper:is([data-topo="audio"], [data-topo="game"]) .topo img { left: -19.61%; width: 119.61%; height: 123.02%; }
+/* Grafika (Figma 28:8736) — jobbra lent, függőlegesen tükrözve */
+.paper[data-topo="graphics"] .topo { width: 879px; height: 672px; transform: matrix(1, 0, 0, -1, 1041, 1080); }
+.paper[data-topo="graphics"] .topo img { left: -.01%; width: 135.97%; }
+/* Kontroller (Figma 28:7991) — bal szél, +90° */
+.paper[data-topo="controller"] .topo { width: 1081px; height: 727px; transform: matrix(0, 1, -1, 0, 727, 0); }
+.paper[data-topo="controller"] .topo img { left: -18.22%; width: 119.61%; }
+/* Akadálymentesség (Figma 28:8006) — a teljes vásznon, forgatás nélkül */
+.paper[data-topo="accessibility"] .topo { width: 1920px; height: 1080px; }
+.paper[data-topo="accessibility"] .topo img { left: -.06%; width: 100.06%; }
 .side { position: absolute; display: block; max-width: none; }
 .side-top { left: 60px; top: 0; width: 1800px; height: 48px; }
 .side-bottom { left: 60px; bottom: 0; width: 1800px; height: 48px; }
@@ -297,15 +309,15 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--red); outli
 
 <div class="wrap">
   <header class="head">
-    <h1>A Feladat · Nyitóoldal és Beállítások — Hang és Akadálymentesség szelet</h1>
+    <h1>A Feladat · Nyitóoldal és Beállítások — Grafika, Hang, Kontroller és Akadálymentesség szelet</h1>
     <p>Settings UI prototípus · spec v1.0 · 1920 × 1080 referencia</p>
   </header>
   <div id="viewport">
     <div id="stage">
-      <div class="paper" aria-hidden="true">
+      <div class="paper" id="paper" data-topo="audio" aria-hidden="true">
         <div class="masked">
           <div class="grid" id="grid"></div>
-          <div class="topo-wrap"><div class="topo"><div><img alt="" src="assets/topomap.png?v=94a433f6"></div></div></div>
+          <div class="topo"><img alt="" src="assets/topomap.png?v=94a433f6"></div>
         </div>
         <img class="side side-top" alt="" src="assets/side-top.svg?v=5a4e2c8c">
         <img class="side side-bottom" alt="" src="assets/side-bottom.svg?v=c157b59d">
@@ -331,4 +343,4 @@ window.__ASSETS_GFX = { preview: "assets/gfx-preview.jpg?v=80d0ebd0" };
 window.__ASSETS_MUSIC = "assets/music-frost-ritual-start.mp3?v=c1aaf1c3";
 window.__ASSETS_MODAL = { arrow: "assets/modal-arrow.svg?v=cf8b1f16", arrowBorder: "assets/modal-arrow-border.svg?v=f6113277", shadowArrow: "assets/modal-shadow-arrow.png?v=eb7da078" };
 </script>
-<script src="app.js?v=d1f51b75"></script>
+<script src="app.js?v=a610537f"></script>

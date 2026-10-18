@@ -599,6 +599,7 @@
       this.padConnected = false;
       this.fontDiag = "m\xE9r\xE9s folyamatban\u2026";
       this.video = document.getElementById("start-video");
+      this.paper = document.getElementById("paper");
       // ---------- megjelenítés ----------
       this.L = (k, v) => t(k, this.ui.lang, v);
       this.sound.onPlay = (id) => {
@@ -799,6 +800,7 @@
       root.lang = this.ui.lang;
       this.stage.classList.toggle("readable", this.store.get("accessibility.readable_font") === "on");
       this.music.volume = this.store.get("audio.music") / 100 * (this.store.get("audio.master") / 100);
+      this.paper?.setAttribute("data-topo", this.ui.cat);
       this.stage.innerHTML = this.ui.screen === "start" ? this.startHTML() : this.settingsHTML();
       this.syncVideo();
       const target = this.stage.querySelector("[data-focus]");

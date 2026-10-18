@@ -1,3 +1,4 @@
 node_modules/
 prototype/dist/
 prototype/build/
+.DS_Store

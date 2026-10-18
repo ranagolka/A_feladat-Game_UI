@@ -468,8 +468,8 @@ function bumper(label: 'LB' | 'RB'): string {
   return `<span class="bumper ${label.toLowerCase()}" aria-hidden="true"><img alt="" src="${ASSETS.bumper}"><span>${label}</span></span>`;
 }
 
-/** A szürkeskála fokai (Figma neutral/scale/*: #111110 ennyi %-os fedéssel; a terv sorában nincs 90). */
-const GREY_SCALE = [0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 95, 100];
+/** A szürkeskála fokai (Figma 28:9021, neutral/scale/*: #111110 ennyi %-os fedéssel). */
+const GREY_SCALE = [0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 100];
 
 /** Fényerő-előnézet (Figma 28:9014 pic · 28:9016 picBG · 28:9021 greyScale).
  *  ⚑ NYITOTT: az élő hatás munkaértéke — a draft értéke CSS brightness()-ként, ±50 → 0,5…1,5. */

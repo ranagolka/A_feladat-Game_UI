@@ -3,8 +3,9 @@
 Kontrolleres Settings-menü prototípus egy Xbox/PC narratív sidescrollerhez (Zsoldos Péter: A Feladat). Nyelv: a kommunikáció és a kódkommentek **magyarul**.
 
 ## Parancsok
-- Build: `cd prototype && npm install && node build.mjs` → `prototype/dist/a-feladat-beallitasok.html`
-- Közzététel: a buildet másold `docs/index.html`-be (a GitHub Pages a `main` ág `/docs` mappájából publikál)
+- Build: `cd prototype && npm install && node build.mjs` → `prototype/dist/site/` (többfájlos: `index.html` · `app.js` · `assets/`, `?v=` tartalom-hash)
+- Közzététel: `node build.mjs --publish` — a `dist/site` tartalmát a `docs/`-ba másolja (a GitHub Pages a `main` ág `/docs` mappájából publikál)
+- Egyfájlos változat (pl. elküldéshez): `node build.mjs --single` → `prototype/dist/a-feladat-beallitasok.html`, minden eszköz data: URI-ként
 - Típusellenőrzés: `cd prototype && npx tsc -p .`
 - Tesztek: `cd prototype && npx esbuild test/store.test.ts --bundle --platform=node --outfile=build/store.test.js && node build/store.test.js`
 
@@ -12,7 +13,7 @@ Kontrolleres Settings-menü prototípus egy Xbox/PC narratív sidescrollerhez (Z
 - `src/schema.ts` beállítás-definíciók · `src/store.ts` default/saved/draft, dirty, tri-state (tiszta logika, tesztelt)
 - `src/input.ts` Gamepad → logikai gomb → kontextusonkénti akció (`BINDINGS`)
 - `src/app.ts` állapotgép (nyitóoldal `start` → `settings`), render, fókusz, modalok, `ctrlButton()` komponens · `src/i18n.ts` EN/HU (kulcsok = Figma `Language / Settings` tokenek)
-- `template.html` CSS + markup; `__ASSET:fájl__` → a build data: URI-vá alakítja (`assets/`)
+- `template.html` CSS + markup; `__ASSET:fájl__` → a build `assets/fájl?v=hash` útvonallá (vagy `--single`-lel data: URI-vá) alakítja
 
 ## Szabályok
 - **A Figma az igazság.** Fájl: `U3RgihQeDTZezzsHujjd9r` (Game UI). Vizuális eszközt ne rajzolj újra: a Figma SVG/PNG-jét használd. 1920×1080 referencia, border-box méretezés.

@@ -5,7 +5,7 @@ Kontrollerrel (vagy fejlesztői billentyűkkel) végigjárható Settings-protot�
 
 ## Élő oldal (GitHub Pages)
 
-`docs/index.html` — egyetlen önálló fájl, minden Figma-eszköz és a teljes Comic Neue font beágyazva.
+`docs/` — a build kimenete: `index.html`, `app.js` és az `assets/` mappa (Figma-eszközök, Comic Neue, videó, zene).
 
 Bekapcsolás: **Settings → Pages → Build and deployment → Source: Deploy from a branch → `main` / `/docs` → Save.**
 Cím: `https://ranagolka.github.io/A_feladat-Game_UI/`
@@ -20,8 +20,8 @@ Fejlesztői billentyűk: nyilak · Q/E = LB/RB · Enter = A · Esc = B · Y = Y 
 ```bash
 cd prototype
 npm install
-node build.mjs                 # → dist/a-feladat-beallitasok.html
-cp dist/a-feladat-beallitasok.html ../docs/index.html
+node build.mjs --publish       # → dist/site/, és a tartalma a ../docs mappába
+node build.mjs --single        # → dist/a-feladat-beallitasok.html — egyetlen önálló fájl
 npx esbuild test/store.test.ts --bundle --platform=node --outfile=build/store.test.js && node build/store.test.js
 ```
 

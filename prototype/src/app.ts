@@ -124,12 +124,14 @@ export class SettingsApp {
     this.render();
   }
 
-  /** A beágyazott videó blob URL-ről indul: a nagy data: URI-t nem minden böngésző játssza le / loopolja megbízhatóan. */
+  /** Többfájlos buildben a videó közvetlenül, folyamatosan töltődik. Az egyfájlos (--single) buildben blob URL-ről indul:
+   *  a nagy data: URI-t nem minden böngésző játssza le / loopolja megbízhatóan. */
   private async loadVideo(): Promise<void> {
     const v = this.video;
     if (!v) return;
     v.poster = ASSETS_START.bg; // betöltésig és csökkentett mozgásnál az állókép látszik
-    try { v.src = URL.createObjectURL(await (await fetch(ASSETS_START.video)).blob()); } catch { v.src = ASSETS_START.video; }
+    if (!ASSETS_START.video.startsWith('data:')) v.src = ASSETS_START.video;
+    else try { v.src = URL.createObjectURL(await (await fetch(ASSETS_START.video)).blob()); } catch { v.src = ASSETS_START.video; }
     this.syncVideo();
   }
 
